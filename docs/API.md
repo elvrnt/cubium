@@ -16,6 +16,10 @@ The timer MVP must not depend on these endpoints.
 
 ### GET /api/v1/health
 
+`GET /health` is also available as an unversioned liveness endpoint with the
+same response. Both endpoints are implemented in the repository foundation.
+They report process liveness and do not check a database or external services.
+
 Response:
 
 ```json

@@ -1,0 +1,32 @@
+:root {
+  font-family: system-ui, sans-serif;
+  color: #edf0f4;
+  background: #171b22;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+}
+
+.app {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: clamp(24px, 6vw, 80px);
+}
+
+.eyebrow {
+  color: #9bcdb9;
+}
+
+h1 {
+  font-size: clamp(36px, 6vw, 64px);
+  letter-spacing: -0.04em;
+}
+
+p {
+  line-height: 1.6;
+}

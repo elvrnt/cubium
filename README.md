@@ -168,7 +168,14 @@ Formatting belongs to the presentation layer.
 
 Frontend and backend must be independently runnable during development.
 
-Expected commands should eventually include:
+The repository foundation is implemented: an independent frontend, a FastAPI
+backend, unit/API tests, a browser smoke test, linting, formatting, and CI.
+The timer MVP is not implemented yet.
+
+Prerequisites: Node.js 22.12+ (Node.js 24 is used in CI), npm, and Python 3.12+.
+Vite's runtime requirements are documented in the [Vite guide](https://vite.dev/guide/).
+
+Frontend:
 
 ```bash
 cd frontend
@@ -181,9 +188,19 @@ and:
 ```bash
 cd backend
 python -m venv .venv
-pip install -e .
+python -m pip install -e ".[dev]"
 uvicorn app.main:app --reload
 ```
+
+On Windows, activate the virtual environment with `.venv\Scripts\Activate.ps1`;
+on macOS/Linux, use `source .venv/bin/activate` before installing dependencies.
+
+The frontend runs at `http://localhost:5173`; the backend runs at
+`http://localhost:8000`. Health endpoints: `/health` and `/api/v1/health`.
+Interactive API documentation is available at `http://localhost:8000/docs`.
+The frontend does not make backend requests or require a backend to start.
+
+See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for verification commands.
 
 When Docker support is implemented:
 
