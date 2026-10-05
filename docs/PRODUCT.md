@@ -1,0 +1,228 @@
+# Product specification
+
+## Product
+
+CubeTrainer is a web application for Rubik's Cube speedsolvers and people learning to solve the Rubik's Cube.
+
+The long-term product combines:
+
+- speedsolving timer;
+- solve statistics;
+- BLD training;
+- letter schemes;
+- memo practice;
+- special BLD scrambles;
+- Old Pochmann solving tools;
+- CFOP algorithms;
+- personal user profile and synchronization.
+
+## Primary target users
+
+### Beginner speedcuber
+
+Needs:
+
+- simple timer;
+- scrambles;
+- basic statistics;
+- solve history.
+
+### Intermediate / advanced speedcuber
+
+Needs:
+
+- fast timer workflow;
+- larger statistics;
+- sessions;
+- notes;
+- penalties;
+- algorithm references.
+
+### Blindfolded solver
+
+Needs:
+
+- custom letter schemes;
+- selectable buffers;
+- memo training;
+- letter pairs;
+- BLD scramble analysis;
+- Old Pochmann tools.
+
+## Main pages
+
+Long-term application navigation:
+
+```text
+Timer
+BLD
+Letter Scheme
+Letter Pairs
+Algorithms
+Profile
+```
+
+MVP implements only the Timer page.
+
+Other routes may exist only as disabled or clearly marked placeholders if explicitly requested.
+
+## Timer page
+
+The Timer page is the application's default page.
+
+When a user opens the application, they should immediately see the timer.
+
+No separate dashboard should be required before using the timer.
+
+### Layout
+
+Main hierarchy:
+
+```text
+navigation
+
+scramble
+
+                timer
+
+statistics                  cube visualization
+
+timer actions
+
+recent solves
+```
+
+The timer should visually dominate the page.
+
+### Scramble
+
+A 3x3 scramble appears directly above the timer.
+
+A new scramble must be available after a completed solve.
+
+The scramble should use standard cube notation.
+
+### Cube visualization
+
+A 2D visualization of the scrambled cube appears near the lower-right area of the timer interface.
+
+It represents the cube state after applying the current scramble.
+
+Use `cubing.js` where practical.
+
+### Statistics
+
+Statistics appear to the left of the timer on desktop.
+
+Initial statistics:
+
+- best;
+- mean;
+- ao5;
+- ao12;
+- ao100.
+
+Unavailable averages should display a neutral placeholder such as `—`.
+
+### Result actions
+
+After a solve, show compact actions:
+
+- note;
+- +2;
+- DNF;
+- delete.
+
+Changing +2 or DNF must immediately update all displayed statistics.
+
+### Recent solves
+
+Display recent solve results below the timer.
+
+The newest solve should be easy to identify.
+
+## Future BLD functionality
+
+Do not implement this during the MVP unless explicitly requested.
+
+### Letter scheme
+
+The user can assign a letter to each relevant sticker.
+
+The user may:
+
+- build a custom letter scheme;
+- choose a predefined scheme;
+- save the scheme to their account.
+
+### Buffers
+
+Allow separate selection of:
+
+- corner buffer;
+- edge buffer.
+
+### BLD scrambles
+
+Future training tools may generate scrambles satisfying specific BLD constraints.
+
+Examples:
+
+- avoid specific buffer-related cases;
+- edge-specific training;
+- corner-specific training;
+- parity training;
+- target-count training.
+
+Such scrambles are training scrambles and must not be represented as official competition scrambles.
+
+### BLD analysis
+
+For a scramble, the application may eventually display:
+
+- corner memo;
+- edge memo;
+- corner targets;
+- edge targets;
+- parity;
+- Old Pochmann solution sequence.
+
+### Letter pairs
+
+Generate useful letter pairs based on the configured letter scheme.
+
+Rules for invalid BLD transitions must be derived from the cube model rather than encoded from an unverified assumption.
+
+## Future CFOP functionality
+
+Algorithms page may contain:
+
+- OLL;
+- PLL;
+- later F2L cases.
+
+For each case:
+
+- case visualization;
+- algorithm;
+- multiple algorithm variants if available;
+- user learning status.
+
+Possible statuses:
+
+```text
+not_learning
+learning
+known
+```
+
+## Non-goals for initial versions
+
+Initial development does not target:
+
+- multiplayer;
+- competitions;
+- live leaderboards;
+- social network features;
+- smart cube Bluetooth integration;
+- native mobile application.
