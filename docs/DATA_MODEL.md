@@ -14,6 +14,9 @@ Do not store:
 
 Calculate them from solves.
 
+The implemented TypeScript solve model, pure operations, statistics result
+types, chronology, and rounding contracts are described in [DOMAIN.md](DOMAIN.md).
+
 ## MVP local entities
 
 ### Solve
