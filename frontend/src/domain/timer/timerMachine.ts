@@ -23,6 +23,8 @@ export function transitionTimer(
       break;
     case 'holding':
       if (event.now < state.holdStartedAt) break;
+      if (event.type === 'CANCEL_HOLD')
+        return { state: createInitialTimerState() };
       if (event.type === 'START_KEY_UP') {
         // Readiness is event-driven: release before a delivered threshold
         // cancels even if the callback was delayed beyond the threshold.
@@ -39,6 +41,9 @@ export function transitionTimer(
       }
       break;
     case 'ready':
+      if (event.type === 'CANCEL_HOLD' && event.now >= state.holdStartedAt) {
+        return { state: createInitialTimerState() };
+      }
       if (
         event.type === 'START_KEY_UP' &&
         event.now - state.holdStartedAt >= DEFAULT_HOLD_THRESHOLD_MS

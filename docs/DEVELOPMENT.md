@@ -2,14 +2,15 @@
 
 ## Current scope
 
-The main page remains a React placeholder alongside FastAPI liveness routes.
+The main page is the usable React Timer MVP alongside FastAPI liveness routes.
 Pure solve/statistics/timer modules, IndexedDB persistence, scramble generation,
 and a reusable 2D cube visualization are implemented. A plain TypeScript timer
 application coordinator connects timer results, scramble ownership, Solve
 creation, persistence, editing and derived statistics. Its deterministic tests
 inject fake repositories, generators and clocks; they do not retest Dexie/cubing.
-The existing dev preview remains dedicated to scramble visualization. The final
-timer page, authentication, and synchronization remain future work.
+The React screen binds the coordinator and provides keyboard timing, result
+editing, statistics, history and error retries. Authentication and synchronization
+remain future work. The separate dev preview remains dedicated to scrambles.
 Frontend and backend can be run and tested independently.
 
 ## Frontend
@@ -43,6 +44,24 @@ is started for this test. On Linux CI, install Chromium with
 
 Use `npm run test:watch` during development and `npm run format` to format files.
 The committed npm lockfile supports reproducible frontend installs.
+
+### Timer verification
+
+Open `/` for the production Timer screen. Hold Space until Ready, release to
+start, then press/release Space to stop. Recent results and statistics update after
+local save. Note/+2/DNF/Delete target the latest result. Reload to verify history,
+penalties and notes persist. Space in editors and on focused buttons keeps native
+behavior; click the timer area to return to timing.
+
+Component tests cover Strict Mode initialization/subscription cleanup, controller
+event translation, repeats, early hold callbacks, blur cancellation, protected
+editing targets, animation-frame cleanup, formatting, actions and retries.
+Playwright runs the real production app with isolated browser storage: complete
+solves, reload, +2, DNF, notes, deletion, repeats, no-scroll input and viewport
+checks. It waits for visible Ready rather than depending on an exact sleep, and
+does not assert exact wall-clock solve durations. Layout screenshots are written
+to ignored `test-results/` output. The standalone scramble preview smoke test is
+retained. Two workers limit concurrent cubing worker startup.
 
 ### Scramble development preview
 

@@ -20,6 +20,26 @@ const stopped: TimerState = {
 };
 
 describe('timer transitions', () => {
+  it.each([holding, ready])(
+    'cancels $status without starting or emitting completion',
+    (state) => {
+      expect(
+        transitionTimer(state, { type: 'CANCEL_HOLD', now: 1400 }),
+      ).toEqual({ state: idle });
+      expect(transitionTimer(state, { type: 'CANCEL_HOLD', now: 999 })).toEqual(
+        { state },
+      );
+    },
+  );
+
+  it.each([idle, running, stopped])(
+    'ignores cancellation in $status',
+    (state) => {
+      expect(
+        transitionTimer(state, { type: 'CANCEL_HOLD', now: 15000 }),
+      ).toEqual({ state });
+    },
+  );
   it('starts idle with a named 300ms threshold', () => {
     expect(createInitialTimerState()).toEqual(idle);
     expect(DEFAULT_HOLD_THRESHOLD_MS).toBe(300);

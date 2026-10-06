@@ -168,9 +168,10 @@ Formatting belongs to the presentation layer.
 
 Frontend and backend must be independently runnable during development.
 
-The repository foundation is implemented: an independent frontend, a FastAPI
-backend, unit/API tests, a browser smoke test, linting, formatting, and CI.
-The timer MVP is not implemented yet.
+The default page is a working 3×3 Timer MVP: hold Space for 300 ms, release to
+start, and press Space to stop. Solves and latest-result +2/DNF/note/delete edits
+are saved in IndexedDB. Statistics and the scrambled 2D cube update locally.
+Unit/API tests, browser workflows, linting, formatting, and CI are configured.
 
 Prerequisites: Node.js 22.12+ (Node.js 24 is used in CI), npm, and Python 3.12+.
 Vite's runtime requirements are documented in the [Vite guide](https://vite.dev/guide/).

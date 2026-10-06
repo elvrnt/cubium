@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './app/App';
+import { createTimerApplication } from './app/createTimerApplication';
 import './app/styles.css';
 
 const root = document.getElementById('root');
@@ -9,8 +10,17 @@ if (!root) {
   throw new Error('Root element is missing');
 }
 
-createRoot(root).render(
+const runtime = createTimerApplication();
+const reactRoot = createRoot(root);
+reactRoot.render(
   <StrictMode>
-    <App />
+    <App application={runtime.application} clock={runtime.clock} />
   </StrictMode>,
 );
+
+if (import.meta.hot) {
+  import.meta.hot.dispose(() => {
+    reactRoot.unmount();
+    runtime.close();
+  });
+}

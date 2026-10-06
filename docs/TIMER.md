@@ -16,8 +16,8 @@ The public pure API is in `frontend/src/domain/timer/index.ts`:
 - `stopped`: `startedAt`, `stoppedAt`, `elapsedMs`.
 
 Every event contains a monotonic `now` timestamp. Event types are
-`START_KEY_DOWN`, `HOLD_THRESHOLD_REACHED`, `START_KEY_UP`, `STOP_KEY_DOWN`, and
-`STOP_KEY_UP`. The threshold event also carries the captured `holdStartedAt`
+`START_KEY_DOWN`, `HOLD_THRESHOLD_REACHED`, `START_KEY_UP`, `STOP_KEY_DOWN`,
+`STOP_KEY_UP`, and `CANCEL_HOLD`. The threshold event also carries the captured `holdStartedAt`
 so a callback from a previous hold cannot arm a different hold.
 
 | Current state | Event and condition | Next state |
@@ -28,6 +28,7 @@ so a callback from a previous hold cannot arm a different hold.
 | ready | START_KEY_UP | running, release timestamp captured |
 | running | STOP_KEY_DOWN | stopped, duration and completion effect returned |
 | stopped | STOP_KEY_UP | idle |
+| holding/ready | CANCEL_HOLD with a valid timestamp | idle, no solve starts |
 
 All other events return the existing state and no effect. Duplicate keydowns,
 stops, releases, and stale callbacks therefore cannot reset the origin or emit
@@ -37,7 +38,7 @@ events are never mutated.
 ## Scheduling and boundary behavior
 
 The default threshold is the named constant `DEFAULT_HOLD_THRESHOLD_MS = 300`.
-The pure machine owns no timeout or interval. A future adapter schedules a
+The pure machine owns no timeout or interval. The browser adapter schedules a
 threshold callback when entering `holding`, captures `holdStartedAt`, and samples
 the clock again when delivering the callback. It should cancel the callback on
 leaving `holding`; the machine also checks its captured hold and elapsed time.
@@ -50,7 +51,7 @@ has not yet been delivered. Releasing after the ready event starts the timer at
 the release timestamp, never at the threshold timestamp. This explicit event
 ordering avoids implicit starts before the ready state has been reached.
 
-The future keyboard adapter maps the physical key to start/stop events based on
+The keyboard adapter maps the physical key to start/stop events based on
 state, ignores `KeyboardEvent.repeat`, and handles editable controls. DOM events,
 keyboard listeners, scheduling, and React integration are outside this engine.
 
@@ -150,7 +151,7 @@ notifying subscribers or awaiting work. Duplicate stops, including reentrant
 subscriber dispatches, cannot create a second record. Early stop release is still
 forwarded, but a new arm is ignored while persistence or generation is pending.
 The domain remains responsible for all timer transition rules and hold scheduling
-remains the future controller's responsibility.
+belongs to the browser controller.
 
 Completion constructs exactly the source fields: injected ID, event `333`, the
 current scramble's notation, `Math.round(elapsedMs)` once, penalty `NONE`, note
@@ -173,6 +174,43 @@ saved/updated. The current scramble is null and arming remains disabled until
 `retryScramble()` succeeds. History-load failure never reports ready empty history.
 One coordinator should own a timer/history view; external writers require future
 refresh/conflict policy.
+
+## React and browser adapters
+
+`app/createTimerApplication.ts` constructs the coordinator, Dexie repository,
+cubing generator, performance clock and ID/date adapters. `main.tsx` creates one
+runtime outside React render and closes its repository after root unmount on HMR
+disposal. Strict Mode effect replay never creates a second runtime. The thin
+`useTimerApplication` hook subscribes with `useSyncExternalStore` and initializes
+only an uninitialized coordinator; subscriptions are cleaned up on unmount.
+
+`features/timer/keyboardController.ts` owns browser listeners and hold timeouts.
+Space down maps idle/canArm to START_KEY_DOWN or running to STOP_KEY_DOWN; only
+the release of an owned press maps back to START_KEY_UP/STOP_KEY_UP. Repeats and
+duplicate downs are ignored. Handled Space prevents scrolling. Text inputs,
+textarea, select, contenteditable, buttons, links and marked editor regions retain
+native keyboard behavior. The entire timer shortcut adapter is suspended while
+the note editor or delete confirmation is open.
+
+The scheduler captures holdStartedAt and uses DEFAULT_HOLD_THRESHOLD_MS; it
+cancels when holding ends. Early callbacks are rescheduled only if the domain
+still reports holding. Blur, hidden documents, entering an editor while holding,
+and cleanup cancel holding/ready via CANCEL_HOLD, so a late release cannot start
+a solve. Running time continues across blur; returning and pressing Space stops
+normally. All listeners and timeouts are removed during cleanup.
+
+`TimerDisplay` mounts its local animation-frame component only while running.
+Each frame reads `application.getElapsedTimeMs()` and formats through the existing
+domain formatter. It never writes frame values into the coordinator or storage.
+Unmount/stop cancels the one scheduled frame. Idle shows zero when history is
+empty, or the latest result (including after reload); holding/ready show zero,
+and stopped shows the captured result. An unsaved completed solve remains visible
+from the retained pending record after key release.
+
+React owns only editor drafts, confirmation visibility and rendering state.
+Business state, rounding, penalty semantics, persistence and statistics remain
+in the application/domain layers. See [UI.md](UI.md#implemented-timer-mvp) for
+page structure and recovery controls.
 
 ## Verification
 

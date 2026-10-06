@@ -187,8 +187,11 @@ Use TanStack Query when backend functionality is implemented.
 The framework-independent `application/timer/TimerApplication` coordinates the
 domain timer, scramble ownership, Solve creation, local repository writes, editing,
 and derived statistics. Its injected dependencies and observable state/recovery
-contract are documented in [TIMER.md](TIMER.md#application-coordinator). React
-bindings and keyboard scheduling remain separate future adapters.
+contract are documented in [TIMER.md](TIMER.md#application-coordinator). The
+`app/createTimerApplication` composition builds the production dependencies once
+in the browser entry, outside React Strict Mode. `features/timer` binds snapshots
+with `useSyncExternalStore`, translates keyboard input and schedules readiness,
+and renders the default Timer page. Visual components never call infrastructure.
 
 The implemented pure timer engine, discriminated state union, event scheduling,
 and completion contract are specified in [TIMER.md](TIMER.md).

@@ -17,6 +17,34 @@ Avoid generic dashboard cards surrounding every element.
 
 ## Main Timer page
 
+### Implemented Timer MVP
+
+The default `/` page uses a quiet dark layout with scramble text above a dominant
+timer, compact statistics on the left, the existing 2D cube on the right, and the
+latest 20 solves below (newest first in presentation only). Navigation contains
+CubeTrainer and Timer. Desktop and laptop layouts use three columns; narrower
+screens place the timer above statistics and cube. State is communicated with
+both text (Idle/Holding/Ready/Running/Stopped) and color.
+
+`TimerPage` composes `TimerDisplay`, `StatisticsPanel`, `CubeVisualization` and
+`ResultActions`. Statistics use coordinator values and domain formatting: numeric
+time, DNF, or an em dash. Scramble/cube input comes only from currentScramble.
+The idle readout retains the latest result; the latest-result caption makes the
+target of Note/+2/DNF/Delete explicit. +2 and DNF buttons toggle to NONE when
+already selected, or select that single penalty otherwise.
+
+The inline note editor loads the current note, preserves text exactly, supports
+save/cancel/Escape, focuses its textarea and returns focus to Note on close.
+Delete uses an inline confirmation with initial focus on Cancel. Actions disable
+while timing or persistence is unresolved. Space on a focused button remains
+native activation; click the timer area or move focus there to time again.
+
+Startup waits for history before showing statistics. History, scramble and
+persistence failures have separate Retry controls through the coordinator.
+Failed writes remain in memory and visibly warn to retry before closing the page;
+failed next generation leaves saved history intact. No component reads IndexedDB
+directly. The isolated `/cube-preview.html` remains a development-only entry.
+
 Desktop concept:
 
 ```text

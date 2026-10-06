@@ -1,4 +1,5 @@
 export type TimerEvent =
+  | { readonly type: 'CANCEL_HOLD'; readonly now: number }
   | { readonly type: 'START_KEY_DOWN'; readonly now: number }
   | {
       readonly type: 'HOLD_THRESHOLD_REACHED';
