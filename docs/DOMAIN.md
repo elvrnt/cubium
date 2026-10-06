@@ -1,4 +1,4 @@
-# Solve and statistics domain
+# Solve, statistics, and timer domain
 
 The framework-independent TypeScript modules in `frontend/src/domain/` are pure
 functions. They have no UI, state-store, database, network, or clock dependencies.
@@ -72,6 +72,8 @@ and milliseconds. This handles carry into a new second or minute. Formatting
 never changes source data. Standard JavaScript number precision applies.
 
 ## Tests
+
+The timer API and scheduling contract are documented in [TIMER.md](TIMER.md).
 
 Colocated Vitest tests cover effective results, all penalty transitions,
 formatting boundaries, comparison, best, mean, ao5/12/100, DNF trimming,

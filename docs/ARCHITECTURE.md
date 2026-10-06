@@ -183,6 +183,9 @@ Use TanStack Query when backend functionality is implemented.
 
 ## Timer state machine
 
+The implemented pure timer engine, discriminated state union, event scheduling,
+and completion contract are specified in [TIMER.md](TIMER.md).
+
 The timer must use explicit states rather than a large collection of overlapping booleans.
 
 Minimum state model:
