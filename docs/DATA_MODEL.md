@@ -16,6 +16,9 @@ Calculate them from solves.
 
 The implemented TypeScript solve model, pure operations, statistics result
 types, chronology, and rounding contracts are described in [DOMAIN.md](DOMAIN.md).
+The [timer application coordinator](TIMER.md#application-coordinator) creates
+these source records from completed timer results, rounding once before saving,
+and retains failed mutations in memory for explicit retry.
 
 ## MVP local entities
 

@@ -4,7 +4,11 @@
 
 The main page remains a React placeholder alongside FastAPI liveness routes.
 Pure solve/statistics/timer modules, IndexedDB persistence, scramble generation,
-and a reusable 2D cube visualization are implemented independently. The final
+and a reusable 2D cube visualization are implemented. A plain TypeScript timer
+application coordinator connects timer results, scramble ownership, Solve
+creation, persistence, editing and derived statistics. Its deterministic tests
+inject fake repositories, generators and clocks; they do not retest Dexie/cubing.
+The existing dev preview remains dedicated to scramble visualization. The final
 timer page, authentication, and synchronization remain future work.
 Frontend and backend can be run and tested independently.
 

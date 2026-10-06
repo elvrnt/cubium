@@ -80,9 +80,10 @@ the adapter preserves the notation string and rejects empty/whitespace-only
 output. Other generation errors propagate unchanged, without retries or fallback
 scrambles. cubing.js is the authority for generated notation validity.
 
-The caller owns the current scramble. Future solve coordination must retain the
-same scramble through start, completion, and persistence before replacing it.
-No lifecycle coordinator or persistence integration exists in these primitives.
+The caller owns the current scramble. The [timer application coordinator](TIMER.md#application-coordinator)
+retains the same scramble through start, completion, and persistence before
+replacing it. The domain primitives themselves have no lifecycle or persistence
+dependencies.
 See [ARCHITECTURE.md](ARCHITECTURE.md#scramble-generation) for the library boundary.
 
 ## Tests
