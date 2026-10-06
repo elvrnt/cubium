@@ -1,4 +1,4 @@
-# Solve, statistics, and timer domain
+# Solve, statistics, timer, and scramble domain
 
 The framework-independent TypeScript modules in `frontend/src/domain/` are pure
 functions. They have no UI, state-store, database, network, or clock dependencies.
@@ -70,6 +70,20 @@ rounding in numeric calculations. Formatting applies `Math.round` once to the
 whole duration (nearest millisecond, half up) before splitting minutes, seconds,
 and milliseconds. This handles carry into a new second or minute. Formatting
 never changes source data. Standard JavaScript number precision applies.
+
+## Scramble contract
+
+`domain/scramble` exports `Scramble` (readonly `event: '333'` and
+`notation: string`) and `ScrambleGenerator.generate333(): Promise<Scramble>`.
+The contract contains no cubing.js types. Each generation returns a new object;
+the adapter preserves the notation string and rejects empty/whitespace-only
+output. Other generation errors propagate unchanged, without retries or fallback
+scrambles. cubing.js is the authority for generated notation validity.
+
+The caller owns the current scramble. Future solve coordination must retain the
+same scramble through start, completion, and persistence before replacing it.
+No lifecycle coordinator or persistence integration exists in these primitives.
+See [ARCHITECTURE.md](ARCHITECTURE.md#scramble-generation) for the library boundary.
 
 ## Tests
 

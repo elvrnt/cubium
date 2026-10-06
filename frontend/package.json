@@ -19,6 +19,7 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "cubing": "0.63.8",
     "dexie": "^4.4.6",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"

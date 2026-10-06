@@ -2,8 +2,10 @@
 
 ## Current scope
 
-This foundation includes a React placeholder page and FastAPI liveness routes.
-Timer, persistence, database, authentication, and synchronization are future work.
+The main page remains a React placeholder alongside FastAPI liveness routes.
+Pure solve/statistics/timer modules, IndexedDB persistence, scramble generation,
+and a reusable 2D cube visualization are implemented independently. The final
+timer page, authentication, and synchronization remain future work.
 Frontend and backend can be run and tested independently.
 
 ## Frontend
@@ -37,6 +39,22 @@ is started for this test. On Linux CI, install Chromium with
 
 Use `npm run test:watch` during development and `npm run format` to format files.
 The committed npm lockfile supports reproducible frontend installs.
+
+### Scramble development preview
+
+Open `/cube-preview.html` on the Vite dev server, or run `npm run build` and
+`npm run preview` to inspect the production bundle. This separate small entry
+shows loading/ready/error states, scramble text, a static 2D cube, and an explicit
+generate/retry button. It has no timer or persistence integration. Both entries
+are included in the production build so cubing worker packaging is exercised.
+
+Generation and visualization unit tests mock the cubing boundary, without random
+expectations or real workers. A Chromium smoke test checks real production-worker
+generation, matching text/visualization input, and browser errors without assuming
+any particular random scramble. Manually check that generation updates both text
+and cube, the cube is scrambled, no player controls appear, and the console is
+free of errors. The library includes large optional lazy chunks; Vite may report
+its default chunk-size warning even though the build succeeds.
 
 ## Backend
 

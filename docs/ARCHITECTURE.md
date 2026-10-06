@@ -280,27 +280,31 @@ Rendering frequency must not affect the measured result.
 
 ## Scramble generation
 
-Use `cubing.js`.
+`infrastructure/cubing/cubingScrambleGenerator.ts` implements the application-owned
+[scramble contract](DOMAIN.md#scramble-contract) using npm `cubing` 0.63.8.
+It awaits the public `randomScrambleForEvent('333')` from `cubing/scramble`, then
+converts the returned algorithm with `toString()`. Generation is local asynchronous
+worker computation; no backend, TanStack Query, custom random-move generator,
+validator, retry policy, or prefetch queue is involved.
 
-Conceptual API:
-
-```ts
-import { randomScrambleForEvent } from "cubing/scramble";
-
-const scramble = await randomScrambleForEvent("333");
-```
-
-Store the resulting scramble as standard notation text.
-
-Scramble generation must be abstracted behind a small domain/service interface so it can be changed or tested independently.
+The Vite build keeps scramble dependencies in a separate chunk so the worker
+does not import the React entry's DOM effects. Module preloading is disabled
+because shared dynamic imports also execute inside workers, without `document`.
+The production preview exercises this bundling boundary.
 
 ## Cube visualization
 
-Prefer `cubing.js` 2D visualization for the MVP.
+`features/cube/CubeVisualization` receives a notation string and wraps the public
+`TwistyPlayer` from `cubing/twisty`. It never generates a scramble. Configuration
+uses `puzzle: '3x3x3'`, `visualization: '2D'`, no controls/viewer link/background,
+and disabled drag/move input. The host is inert and fits a responsive parent.
 
-The visualization must represent the state after applying the current scramble.
-
-It does not need animation during the MVP.
+The whole scramble is applied as `experimentalSetupAlg`, anchored at `start`,
+with an empty playback `alg`. Thus the initial static pattern is already the
+state **after** the scramble, not a solved cube awaiting playback. These documented
+experimental options are isolated inside this component; check them when upgrading
+cubing. See the official [setup algorithm documentation](https://js.cubing.net/cubing/twisty/).
+React effect cleanup removes the player on change/unmount, including StrictMode.
 
 ## Statistics
 
