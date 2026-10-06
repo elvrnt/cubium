@@ -25,6 +25,7 @@ export interface StatisticsSummary {
   readonly mean: number | null;
   readonly ao5: Readonly<AverageResult>;
   readonly ao12: Readonly<AverageResult>;
+  readonly ao50: Readonly<AverageResult>;
   readonly ao100: Readonly<AverageResult>;
 }
 
@@ -51,6 +52,7 @@ export type PersistenceState =
 
 export interface TimerApplicationState {
   readonly timer: TimerState;
+  readonly displayedSolveId: string | null;
   readonly history: LoadState;
   readonly currentScramble: Scramble | null;
   readonly scramble: ScrambleState;

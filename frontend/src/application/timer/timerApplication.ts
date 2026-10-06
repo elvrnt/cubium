@@ -2,12 +2,14 @@ import type { Solve, SolvePenalty } from '../../domain/solves';
 import {
   compareSolvesChronologically,
   setSolvePenalty,
+  setSolveNote,
 } from '../../domain/solves';
 import {
   calculateBest,
   calculateMean,
   calculateAo5,
   calculateAo12,
+  calculateAo50,
   calculateAo100,
 } from '../../domain/statistics';
 import {
@@ -30,6 +32,7 @@ function statistics(solves: readonly Solve[]): StatisticsSummary {
     mean: calculateMean(solves),
     ao5: Object.freeze(calculateAo5(solves)),
     ao12: Object.freeze(calculateAo12(solves)),
+    ao50: Object.freeze(calculateAo50(solves)),
     ao100: Object.freeze(calculateAo100(solves)),
   });
 }
@@ -41,6 +44,7 @@ export class TimerApplication {
     timer: Object.freeze(createInitialTimerState()),
     history: Object.freeze({ status: 'uninitialized' }),
     currentScramble: null,
+    displayedSolveId: null,
     scramble: Object.freeze({ status: 'uninitialized' }),
     persistence: Object.freeze({ status: 'idle' }),
     solves: Object.freeze([]),
@@ -117,9 +121,11 @@ export class TimerApplication {
       return;
     }
     // Reserve generation before notifying observers that history is ready.
+    const collection = this.collection(solves);
     this.publish({
-      ...this.collection(solves),
+      ...collection,
       history: { status: 'ready' },
+      displayedSolveId: collection.solves.at(-1)?.id ?? null,
       scramble: { status: 'loading' },
     });
     await this.generateScramble();
@@ -173,6 +179,7 @@ export class TimerApplication {
     this.publish({
       timer: result.state,
       persistence: { status: 'saving', pending },
+      displayedSolveId: solve.id,
     });
     await this.persist(pending);
   }
@@ -200,7 +207,7 @@ export class TimerApplication {
 
   async updateNote(id: string, note: string | null): Promise<void> {
     this.requireEditable();
-    await this.update({ ...this.findSolve(id), note });
+    await this.update(setSolveNote(this.findSolve(id), note));
   }
 
   private async update(solve: Solve): Promise<void> {
@@ -264,6 +271,11 @@ export class TimerApplication {
     } else {
       this.publish({
         ...this.collection(solves),
+        displayedSolveId:
+          pending.type === 'delete' &&
+          pending.solveId === this.state.displayedSolveId
+            ? null
+            : this.state.displayedSolveId,
         persistence: { status: 'idle' },
       });
     }

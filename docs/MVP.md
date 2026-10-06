@@ -24,6 +24,7 @@ The MVP must be useful even with no backend connection.
 - mean;
 - ao5;
 - ao12;
+- ao50;
 - ao100;
 - responsive layout;
 - basic automated tests.
@@ -178,7 +179,8 @@ Deleting a solve recalculates statistics immediately.
 
 ### Note
 
-Allow a short free-text note for a solve.
+Allow a free-text note of at most 300 UTF-16 code units for a solve, enforced
+by the domain/application contract as well as the editor (see [DOMAIN.md](DOMAIN.md)).
 
 The timer must not react to Space while the note field is active.
 
@@ -270,6 +272,7 @@ For:
 ```text
 ao5
 ao12
+ao50
 ao100
 ```
 
@@ -293,6 +296,7 @@ Therefore:
 ```text
 ao5   -> remove 1 best and 1 worst
 ao12  -> remove 1 best and 1 worst
+ao50  -> remove 3 best and 3 worst
 ao100 -> remove 5 best and 5 worst
 ```
 

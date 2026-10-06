@@ -1,6 +1,12 @@
 import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
 
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('cubium.language', 'en');
+  });
+});
+
 async function ready(page: Page) {
   await expect(page.getByTestId('scramble')).toBeVisible({ timeout: 20_000 });
   await expect(page.locator('.timer-readout__status')).toHaveText(
@@ -66,7 +72,7 @@ test('loads the real timer with scramble, cube, zero, and no errors', async ({
   });
   await page.goto('/');
   await ready(page);
-  await expect(page).toHaveTitle('CubeTrainer');
+  await expect(page).toHaveTitle('Cubium');
   await expect(page.getByRole('heading', { name: '3×3 Timer' })).toBeAttached();
   await expect(page.getByRole('timer')).toHaveText('0.000');
   await expect(page.getByRole('img')).toHaveAccessibleName(
@@ -123,13 +129,19 @@ test('DNF replaces +2, survives reload and toggles off', async ({ page }) => {
   await solve(page);
   await page.getByRole('button', { name: '+2', exact: true }).click();
   await expect(page.getByTestId('recent-solve')).toHaveText(/\+$/);
-  await page.getByRole('button', { name: 'DNF', exact: true }).click();
+  await page
+    .getByRole('region', { name: 'Solve actions' })
+    .getByRole('button', { name: 'DNF', exact: true })
+    .click();
   await expect(page.getByTestId('recent-solve')).toHaveText('DNF');
   await expect(page.getByTestId('stat-best')).toHaveText('—');
   await page.reload();
   await ready(page);
   await expect(page.getByTestId('recent-solve')).toHaveText('DNF');
-  await page.getByRole('button', { name: 'DNF', exact: true }).click();
+  await page
+    .getByRole('region', { name: 'Solve actions' })
+    .getByRole('button', { name: 'DNF', exact: true })
+    .click();
   await expect(page.getByTestId('recent-solve')).not.toHaveText('DNF');
 });
 
@@ -139,7 +151,7 @@ test('edits notes with spaces without timing, supports cancel, and persists afte
   await page.goto('/');
   await solve(page);
   await page.getByRole('button', { name: 'Note', exact: true }).click();
-  const note = page.getByRole('textbox', { name: 'Note for latest solve' });
+  const note = page.getByRole('textbox', { name: 'Note for solve' });
   await note.fill('Cross');
   await page.keyboard.press('Space');
   await note.pressSequentially('then pairs');

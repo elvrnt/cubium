@@ -2,7 +2,7 @@
 
 ## Architectural style
 
-CubeTrainer uses a client-server architecture with a local-first frontend.
+Cubium uses a client-server architecture with a local-first frontend.
 
 The frontend is not a thin client.
 
@@ -132,6 +132,7 @@ Functions such as:
 ```text
 calculateAo5
 calculateAo12
+calculateAo50
 calculateAo100
 applyPenalty
 formatSolveTime
@@ -171,6 +172,14 @@ Examples:
 - user preferences.
 
 Use IndexedDB through Dexie.
+
+The small MVP language preference is an exception: `app/i18n.tsx` owns a typed
+RU/EN dictionary and React context, with Russian as fallback. It stores only the
+language code in localStorage under `cubium.language` and sets the document's
+language for assistive technology. Unavailable storage leaves switching usable
+in memory. This preference and history selection never enter Solve records.
+The internal IndexedDB name remains `CubeTrainerDB` after the Cubium rename,
+preserving existing data without a schema migration.
 
 ### Server state
 
@@ -324,6 +333,7 @@ Do not persist:
 
 - ao5;
 - ao12;
+- ao50;
 - ao100;
 - mean;
 - best.

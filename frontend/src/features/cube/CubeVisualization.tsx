@@ -4,10 +4,11 @@ import './CubeVisualization.css';
 
 export interface CubeVisualizationProps {
   scramble: string;
+  label?: string;
 }
 
 /** Static final pattern. Generation and scramble ownership belong to the caller. */
-export function CubeVisualization({ scramble }: CubeVisualizationProps) {
+export function CubeVisualization({ scramble, label }: CubeVisualizationProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -40,7 +41,7 @@ export function CubeVisualization({ scramble }: CubeVisualizationProps) {
       className="cube-visualization"
       ref={containerRef}
       role="img"
-      aria-label={`3×3 cube after scramble: ${scramble}`}
+      aria-label={label ?? `3×3 cube after scramble: ${scramble}`}
     />
   );
 }

@@ -4,6 +4,7 @@ import type {
   TimerApplicationState,
 } from '../../application/timer';
 import { formatSolveTime, formatTimeMs } from '../../domain/solves';
+import { useLanguage } from '../../app/i18n';
 
 function RunningTime({ application }: { application: TimerApplication }) {
   const [elapsed, setElapsed] = useState(0);
@@ -26,7 +27,10 @@ export function TimerDisplay({
   application: TimerApplication;
   state: TimerApplicationState;
 }) {
-  const latest = state.solves.at(-1);
+  const { t } = useLanguage();
+  const displayed = state.solves.find(
+    (solve) => solve.id === state.displayedSolveId,
+  );
   const pending =
     state.persistence.status !== 'idle' &&
     state.persistence.pending.type === 'save'
@@ -34,27 +38,26 @@ export function TimerDisplay({
       : null;
   const labels = {
     idle: state.canArm
-      ? 'Idle · Hold Space to get ready'
-      : 'Idle · Waiting to start',
-    holding: 'Holding · Keep holding Space',
-    ready: 'Ready · Release Space to start',
-    running: 'Running · Press Space to stop',
-    stopped: 'Stopped · Release Space',
+      ? t('Idle · Hold Space to get ready')
+      : t('Idle · Waiting to start'),
+    holding: t('Holding · Keep holding Space'),
+    ready: t('Ready · Release Space to start'),
+    running: t('Running · Press Space to stop'),
+    stopped: t('Stopped · Release Space'),
   };
-  const restingResult = pending ?? latest;
+  const restingResult = pending ?? displayed;
   return (
     <div className="timer-readout" data-state={state.timer.status}>
       <div
         className="timer-readout__value"
         role="timer"
-        aria-label="Solve time"
+        aria-label={t('Solve time')}
         aria-live="off"
       >
         {state.timer.status === 'running' ? (
           <RunningTime application={application} />
-        ) : state.timer.status === 'stopped' ? (
-          formatTimeMs(state.timer.elapsedMs)
-        ) : state.timer.status === 'idle' && restingResult ? (
+        ) : ['idle', 'stopped'].includes(state.timer.status) &&
+          restingResult ? (
           formatSolveTime(restingResult)
         ) : (
           '0.000'

@@ -1,12 +1,14 @@
 import type { StatisticsSummary } from '../../application/timer';
 import type { AverageResult } from '../../domain/statistics';
 import { formatTimeMs } from '../../domain/solves';
+import { useLanguage } from '../../app/i18n';
 
 export function StatisticsPanel({
   statistics,
 }: {
   statistics: StatisticsSummary;
 }) {
+  const { t } = useLanguage();
   const time = (value: number | null) =>
     value === null ? '—' : formatTimeMs(value);
   const average = (value: Readonly<AverageResult>) =>
@@ -20,15 +22,16 @@ export function StatisticsPanel({
     ['mean', time(statistics.mean)],
     ['ao5', average(statistics.ao5)],
     ['ao12', average(statistics.ao12)],
+    ['ao50', average(statistics.ao50)],
     ['ao100', average(statistics.ao100)],
-  ];
+  ] as const;
   return (
-    <aside className="timer-statistics" aria-label="Statistics">
-      <h2>Statistics</h2>
+    <aside className="timer-statistics" aria-label={t('Statistics')}>
+      <h2>{t('Statistics')}</h2>
       <dl>
         {values.map(([label, value]) => (
           <div key={label}>
-            <dt>{label}</dt>
+            <dt>{t(label)}</dt>
             <dd data-testid={`stat-${label}`}>{value}</dd>
           </div>
         ))}

@@ -20,5 +20,6 @@ def test_health_routes_are_documented() -> None:
 
     assert response.status_code == 200
     paths = response.json()["paths"]
+    assert response.json()["info"]["title"] == "Cubium API"
     for path in ("/health", "/api/v1/health"):
         assert "200" in paths[path]["get"]["responses"]

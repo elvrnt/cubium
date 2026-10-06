@@ -1,6 +1,6 @@
-# CubeTrainer
+# Cubium
 
-CubeTrainer is a client-server web application for Rubik's Cube speedsolving, training, statistics, algorithms, and blindfolded solving practice.
+Cubium is a client-server web application for Rubik's Cube speedsolving, training, statistics, algorithms, and blindfolded solving practice.
 
 The main goal of the project is to provide a fast, keyboard-first Rubik's Cube timer and later extend it with BLD training, letter schemes, memo generation, Old Pochmann tools, and CFOP algorithms.
 
@@ -72,7 +72,7 @@ unless explicitly requested.
 
 ## Architecture
 
-CubeTrainer uses a local-first architecture.
+Cubium uses a local-first architecture.
 
 The browser is responsible for:
 
@@ -119,6 +119,7 @@ Required functionality:
 - calculate mean;
 - calculate ao5;
 - calculate ao12;
+- calculate ao50;
 - calculate ao100;
 - persist data in IndexedDB.
 
@@ -169,8 +170,13 @@ Formatting belongs to the presentation layer.
 Frontend and backend must be independently runnable during development.
 
 The default page is a working 3×3 Timer MVP: hold Space for 300 ms, release to
-start, and press Space to stop. Solves and latest-result +2/DNF/note/delete edits
-are saved in IndexedDB. Statistics and the scrambled 2D cube update locally.
+start, and press Space to stop. Select any recent solve to inspect its original
+scramble and edit +2/DNF, a note (up to 300 characters), or delete it. Deleting
+the displayed result resets the readout to zero without selecting an older time.
+Click the cube to enlarge it. Russian is the default language; the RU/EN selector
+remembers its preference locally. Statistics include ao50 and update locally.
+Solves remain in the existing `CubeTrainerDB` IndexedDB database for compatibility;
+the Cubium rename does not migrate or delete existing data.
 Unit/API tests, browser workflows, linting, formatting, and CI are configured.
 
 Prerequisites: Node.js 22.12+ (Node.js 24 is used in CI), npm, and Python 3.12+.

@@ -4,6 +4,7 @@ import type { Solve } from '../../domain/solves';
 import {
   calculateAo5,
   calculateAo12,
+  calculateAo50,
   calculateAo100,
   calculateBest,
   calculateMean,
@@ -139,6 +140,7 @@ describe('initialization and observation', () => {
       mean: calculateMean(rows),
       ao5: calculateAo5(rows),
       ao12: calculateAo12(rows),
+      ao50: calculateAo50(rows),
       ao100: calculateAo100(rows),
     });
     expect(app.getState().currentScramble).toEqual(A);

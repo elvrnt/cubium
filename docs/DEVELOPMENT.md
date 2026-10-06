@@ -49,7 +49,8 @@ The committed npm lockfile supports reproducible frontend installs.
 
 Open `/` for the production Timer screen. Hold Space until Ready, release to
 start, then press/release Space to stop. Recent results and statistics update after
-local save. Note/+2/DNF/Delete target the latest result. Reload to verify history,
+local save. Note/+2/DNF/Delete target the result identified by the action caption;
+select any recent result to edit its historical record. Reload to verify history,
 penalties and notes persist. Space in editors and on focused buttons keeps native
 behavior; click the timer area to return to timing.
 
@@ -62,6 +63,16 @@ checks. It waits for visible Ready rather than depending on an exact sleep, and
 does not assert exact wall-clock solve durations. Layout screenshots are written
 to ignored `test-results/` output. The standalone scramble preview smoke test is
 retained. Two workers limit concurrent cubing worker startup.
+
+Polish checks cover Cubium branding, RU default and both language switches,
+preference reload, native cube dialog/Escape/focus return, historical scramble
+isolation, a persisted 300-character note, penalty edits and deletion of older
+versus displayed results. Unit tests cover ao50 trimming/DNFs/latest-window/+2,
+note lengths 299/300/301, and validation before repository writes. jsdom component
+tests stub native dialog opening; Playwright verifies real browser modal behavior.
+Manually inspect both languages at desktop and laptop widths, enlarge the cube,
+open a historical editor and check the console. Deleting displayed B after A
+must leave A in history while the central timer becomes 0.000.
 
 ### Scramble development preview
 

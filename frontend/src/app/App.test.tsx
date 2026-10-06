@@ -6,7 +6,8 @@ import {
   screen,
   waitFor,
 } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest';
+import { LANGUAGE_STORAGE_KEY } from './i18n';
 import { App } from './App';
 import { timerApplicationFixture } from '../test/timerApplicationFixture';
 import { makeSolve } from '../test/solveFixtures';
@@ -18,6 +19,8 @@ vi.mock('../features/cube', () => ({
 }));
 
 describe('Timer page', () => {
+  beforeEach(() => localStorage.setItem(LANGUAGE_STORAGE_KEY, 'en'));
+  afterEach(() => localStorage.clear());
   it('initializes once in StrictMode and unsubscribes cleanly', async () => {
     const fixture = timerApplicationFixture();
     const originalSubscribe = fixture.application.subscribe;
@@ -86,7 +89,7 @@ describe('Timer page', () => {
     );
     fireEvent.click(screen.getByRole('button', { name: 'Note' }));
     const input = screen.getByRole('textbox', {
-      name: 'Note for latest solve',
+      name: 'Note for solve',
     });
     expect(input).toHaveValue('old note');
     expect(input).toHaveFocus();

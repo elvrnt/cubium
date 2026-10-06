@@ -1,1 +1,1 @@
-"""CubeTrainer backend package."""
+"""Cubium backend package."""

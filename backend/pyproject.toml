@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "cubetrainer-backend"
 version = "0.1.0"
-description = "Local-first CubeTrainer backend"
+description = "Local-first Cubium backend"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [

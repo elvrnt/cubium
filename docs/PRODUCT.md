@@ -2,7 +2,7 @@
 
 ## Product
 
-CubeTrainer is a web application for Rubik's Cube speedsolvers and people learning to solve the Rubik's Cube.
+Cubium is a web application for Rubik's Cube speedsolvers and people learning to solve the Rubik's Cube.
 
 The long-term product combines:
 
@@ -120,6 +120,7 @@ Initial statistics:
 - mean;
 - ao5;
 - ao12;
+- ao50;
 - ao100.
 
 Unavailable averages should display a neutral placeholder such as `—`.
@@ -140,6 +141,14 @@ Changing +2 or DNF must immediately update all displayed statistics.
 Display recent solve results below the timer.
 
 The newest solve should be easy to identify.
+
+Every recent result is selectable. Its details expose the exact historical
+scramble, penalty, note and deletion controls without changing the current
+scramble. Notes accept up to 300 characters. Deleting the displayed completed
+result resets the timer to zero; editing older history leaves that result alone.
+
+The cube opens in an enlarged dialog. The MVP supports Russian (default) and
+English with a locally remembered language choice; see [UI.md](UI.md).
 
 ## Future BLD functionality
 

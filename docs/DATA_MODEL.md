@@ -10,6 +10,7 @@ Do not store:
 - mean;
 - ao5;
 - ao12;
+- ao50;
 - ao100.
 
 Calculate them from solves.
@@ -52,6 +53,14 @@ one store and the schema declaration:
 ```ts
 database.version(1).stores({ solves: 'id, createdAt, event' });
 ```
+
+Cubium deliberately keeps `CubeTrainerDB` as an internal compatibility identifier.
+The product rename leaves the database, version and records unchanged; no migration
+or deletion is performed. Language preferences use localStorage; selected history
+and displayed-result identity are transient and do not add persistent fields.
+New note edits are validated in the application/domain contract against
+`MAX_SOLVE_NOTE_LENGTH` (300 UTF-16 code units; see [DOMAIN.md](DOMAIN.md)). Existing
+records are not rewritten or truncated when loaded.
 
 `id` is the unique, non-auto-incrementing primary key supplied by the caller.
 `createdAt` and `event` are non-unique secondary indexes for chronological and

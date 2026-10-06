@@ -1,4 +1,4 @@
-# CubeTrainer backend
+# Cubium backend
 
 Minimal FastAPI application with `GET /health` and `GET /api/v1/health`.
 Both return `{"status":"ok"}` without authentication or a database connection.

@@ -12,6 +12,7 @@ it('formats numeric statistics, DNF, and unavailable averages', () => {
         mean: null,
         ao5: { status: 'OK', timeMs: 63582 },
         ao12: { status: 'DNF' },
+        ao50: { status: 'OK', timeMs: 12000 },
         ao100: { status: 'INSUFFICIENT_DATA' },
       }}
     />,
@@ -20,6 +21,7 @@ it('formats numeric statistics, DNF, and unavailable averages', () => {
   expect(screen.getByTestId('stat-mean')).toHaveTextContent('—');
   expect(screen.getByTestId('stat-ao5')).toHaveTextContent('1:03.582');
   expect(screen.getByTestId('stat-ao12')).toHaveTextContent('DNF');
+  expect(screen.getByTestId('stat-ao50')).toHaveTextContent('12.000');
   expect(screen.getByTestId('stat-ao100')).toHaveTextContent('—');
 });
 

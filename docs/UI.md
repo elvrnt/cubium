@@ -22,21 +22,24 @@ Avoid generic dashboard cards surrounding every element.
 The default `/` page uses a quiet dark layout with scramble text above a dominant
 timer, compact statistics on the left, the existing 2D cube on the right, and the
 latest 20 solves below (newest first in presentation only). Navigation contains
-CubeTrainer and Timer. Desktop and laptop layouts use three columns; narrower
+Cubium and Timer. Desktop and laptop layouts use three columns; narrower
 screens place the timer above statistics and cube. State is communicated with
 both text (Idle/Holding/Ready/Running/Stopped) and color.
 
 `TimerPage` composes `TimerDisplay`, `StatisticsPanel`, `CubeVisualization` and
 `ResultActions`. Statistics use coordinator values and domain formatting: numeric
 time, DNF, or an em dash. Scramble/cube input comes only from currentScramble.
-The idle readout retains the latest result; the latest-result caption makes the
-target of Note/+2/DNF/Delete explicit. +2 and DNF buttons toggle to NONE when
+The idle readout retains the independently tracked displayed result. Deleting it
+shows 0.000 even when older history remains. Compact actions identify their target
+by its formatted result. +2 and DNF buttons toggle to NONE when
 already selected, or select that single penalty otherwise.
 
 The inline note editor loads the current note, preserves text exactly, supports
 save/cancel/Escape, focuses its textarea and returns focus to Note on close.
 Delete uses an inline confirmation with initial focus on Cancel. Actions disable
-while timing or persistence is unresolved. Space on a focused button remains
+while timing or persistence is unresolved. Notes use the domain's 300-character
+limit, a used/maximum counter and accessible validation without trimming text.
+Space on a focused button remains
 native activation; click the timer area or move focus there to time again.
 
 Startup waits for history before showing statistics. History, scramble and
@@ -45,11 +48,24 @@ Failed writes remain in memory and visibly warn to retry before closing the page
 failed next generation leaves saved history intact. No component reads IndexedDB
 directly. The isolated `/cube-preview.html` remains a development-only entry.
 
+Russian is the initial MVP language. A labelled RU/EN selector changes all timer
+labels and messages, while notation, numeric results, +2, DNF and ao abbreviations
+stay unchanged. The choice survives reload (see [ARCHITECTURE.md](ARCHITECTURE.md)).
+
+The inline cube is a labelled button opening the same `CubeVisualization` in a
+larger native modal dialog. Close and Escape dismiss it and restore focus to the
+opener. Recent results are buttons with hover/focus and pressed selection styles.
+Selecting one opens a compact details dialog with the stored historical scramble
+as selectable text and reusable result actions. The current scramble/cube never
+changes because of selection. Successful deletion closes the selected editor;
+failed writes remain retryable inside it. Native dialogs trap focus and make the
+background inert; timer shortcuts are suspended while either dialog is open.
+
 Desktop concept:
 
 ```text
 ┌───────────────────────────────────────────────────────────────┐
-│ CubeTrainer       Timer    BLD    Algorithms          Profile │
+│ Cubium       Timer    BLD    Algorithms          Profile │
 ├───────────────────────────────────────────────────────────────┤
 │                                                               │
 │                   R U2 F' L2 D R2 ...                         │
@@ -133,6 +149,7 @@ best
 mean
 ao5
 ao12
+ao50
 ao100
 ```
 

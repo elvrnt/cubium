@@ -76,3 +76,7 @@ export function calculateAo12(solves: readonly Solve[]): AverageResult {
 export function calculateAo100(solves: readonly Solve[]): AverageResult {
   return calculateAverageOf(solves, 100);
 }
+
+export function calculateAo50(solves: readonly Solve[]): AverageResult {
+  return calculateAverageOf(solves, 50);
+}

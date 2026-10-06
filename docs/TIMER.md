@@ -110,7 +110,8 @@ connection lifetime; the coordinator does not close shared adapters.
 - `timer`: the existing timer union;
 - `history`: uninitialized/loading/ready/error, with the original error on failure;
 - `solves`: immutable records ordered by instant then ID, oldest first;
-- `statistics`: best, mean, ao5, ao12, ao100 composed from existing domain functions;
+- `statistics`: best, mean, ao5, ao12, ao50, ao100 composed from existing domain functions;
+- `displayedSolveId`: independent central-result identity, or null for zero;
 - `currentScramble`: immutable application scramble or null;
 - `scramble`: uninitialized/loading/ready/error;
 - `persistence`: idle, saving with a pending mutation, or error with that mutation
@@ -133,7 +134,7 @@ exceptions are logged and isolated so they cannot interrupt persistence. Stable
 | `retryScramble()` | Retry failed generation; otherwise no-op. |
 | `retryPersistence()` | Retry the retained failed mutation; otherwise no-op. |
 | `setPenalty(id, penalty)` | Apply `setSolvePenalty`, persist a new snapshot, update history/statistics. |
-| `updateNote(id, note)` | Persist the exact string or null, preserving other fields; no normalization. |
+| `updateNote(id, note)` | Validate through `setSolveNote`, then persist the exact string or null; reject more than `MAX_SOLVE_NOTE_LENGTH` before writing. |
 | `deleteSolve(id)` | Persist deletion before removing the record and recalculating statistics. Unknown IDs are no-ops. |
 
 Missing IDs for updates reject with the existing `SolveNotFoundError`. Editing
@@ -202,10 +203,16 @@ normally. All listeners and timeouts are removed during cleanup.
 `TimerDisplay` mounts its local animation-frame component only while running.
 Each frame reads `application.getElapsedTimeMs()` and formats through the existing
 domain formatter. It never writes frame values into the coordinator or storage.
-Unmount/stop cancels the one scheduled frame. Idle shows zero when history is
-empty, or the latest result (including after reload); holding/ready show zero,
-and stopped shows the captured result. An unsaved completed solve remains visible
-from the retained pending record after key release.
+Unmount/stop cancels the one scheduled frame. Holding/ready show zero. Idle and
+stopped resolve `displayedSolveId` to its result, including penalty changes, or
+show zero when it is null. A new completion selects its new ID before saving;
+an unsaved result remains visible from the pending record. Successful deletion
+clears that ID only when it matches the deleted solve, so the readout never falls
+back to older history. Failed deletion retains it until a successful retry.
+Editing/deleting a different historical solve leaves it unchanged. On a fresh
+page load the latest durable solve is selected initially (or zero with no history);
+the display identity and historical editor selection are not persisted. Timer
+domain states, precise timestamps and transition semantics remain unchanged.
 
 React owns only editor drafts, confirmation visibility and rendering state.
 Business state, rounding, penalty semantics, persistence and statistics remain

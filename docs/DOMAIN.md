@@ -24,6 +24,10 @@ Import from `frontend/src/domain/solves/index.ts`:
   Minutes continue past 59. Negative or non-finite inputs throw `RangeError`.
 - `formatSolveTime(solve): string`: effective duration with a trailing `+` for
   `PLUS_TWO`, or `DNF`.
+- `MAX_SOLVE_NOTE_LENGTH = 300` and `setSolveNote(solve, note)`: copy with the
+  exact string or null, rejecting oversized strings with `RangeError`. Length is
+  measured in UTF-16 code units, matching JavaScript `string.length` and HTML
+  `maxLength` (some emoji use multiple units). No truncation or normalization.
 
 ## Statistics API
 
@@ -36,8 +40,10 @@ Import from `frontend/src/domain/statistics/index.ts`:
   by effective result, with `ceil(N * 0.05)` removed from each end. A retained
   DNF makes the average DNF. `count` must be a safe integer of at least 3;
   invalid counts throw `RangeError`, including for empty input.
-- `calculateAo5`, `calculateAo12`, `calculateAo100`: thin wrappers over the generic
-  average, trimming 1, 1, and 5 results respectively from each end.
+- `calculateAo5`, `calculateAo12`, `calculateAo50`, `calculateAo100`: thin wrappers
+  over the generic average, trimming 1, 1, 3, and 5 results respectively from each
+  end. ao50 selects the latest 50 and averages the remaining 44; up to three DNFs
+  can be discarded as the worst results, but any retained DNF makes it DNF.
 
 `best` and `mean` return `null` when there are no valid numeric results.
 The `AverageResult` discriminated union distinguishes all three average states:
@@ -91,7 +97,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md#scramble-generation) for the library bound
 The timer API and scheduling contract are documented in [TIMER.md](TIMER.md).
 
 Colocated Vitest tests cover effective results, all penalty transitions,
-formatting boundaries, comparison, best, mean, ao5/12/100, DNF trimming,
+formatting boundaries, comparison, best, mean, ao5/12/50/100, DNF trimming,
 insufficient data, generic window sizes, chronology, timestamp ties, precision,
 and immutability. Domain test files select the Node environment.
 
