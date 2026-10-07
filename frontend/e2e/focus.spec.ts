@@ -44,7 +44,7 @@ test('pointer language selection returns Space to timer', async ({ page }) => {
   await page.keyboard.press('Escape');
   await expect(page.getByRole('main')).toBeFocused();
   await startWithSpace(page);
-  await expect(language).toHaveValue('en');
+  await expect(page.locator('.language-selector select')).toHaveValue('en');
 });
 
 test('Tab navigation retains native language control and cube button activation', async ({
@@ -65,10 +65,6 @@ test('Tab navigation retains native language control and cube button activation'
     'idle',
   );
   await page.keyboard.press('Escape');
-  await page.keyboard.press('Tab'); // statistics help
-  await expect(
-    page.getByRole('button', { name: 'About statistics' }),
-  ).toBeFocused();
   await page.keyboard.press('Tab'); // timer area
   await page.keyboard.press('Tab'); // cube
   await expect(

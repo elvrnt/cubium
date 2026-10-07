@@ -1,7 +1,26 @@
+@import './fonts.css';
+
 :root {
-  font-family: system-ui, sans-serif;
-  color: #edf0f4;
-  background: #16211e;
+  --font-ui: 'Golos Text', system-ui, sans-serif;
+  --font-numeric: 'Cubium Golos Numeric', system-ui, sans-serif;
+  --font-notation: 'IBM Plex Mono', ui-monospace, Consolas, monospace;
+  font-family: var(--font-ui);
+  font-size: 100%;
+  line-height: 1.5;
+  --surface: #f5f3ec;
+  --ink: #18232e;
+  --muted: #596470;
+  --line: #cbd0d1;
+  --control-border: #7d8791;
+  --accent: #244ac7;
+  --accent-soft: #e5eafa;
+  --ready: #176b45;
+  --holding: #85570b;
+  --danger: #a02d34;
+  --surface-raised: #fffdf8;
+  color: var(--ink);
+  background: var(--surface);
+  color-scheme: light;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -9,7 +28,18 @@
 
 body {
   margin: 0;
-  min-width: 320px;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--surface-raised);
+}
+html {
+  scrollbar-color: var(--control-border) var(--surface);
+}
+input,
+textarea {
+  caret-color: var(--accent);
 }
 
 .app {

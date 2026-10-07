@@ -210,8 +210,8 @@ it('keeps statistics help unavailable during timing', async () => {
   const fixture = timerApplicationFixture();
   render(<App {...fixture} />);
   await screen.findByText('R U2');
+  const trigger = screen.getByRole('button', { name: 'About statistics' });
   await start(fixture);
-  expect(
-    screen.getByRole('button', { name: 'About statistics' }),
-  ).toBeDisabled();
+  expect(trigger).toBeDisabled();
+  expect(screen.queryByRole('button', { name: 'About statistics' })).toBeNull();
 });
