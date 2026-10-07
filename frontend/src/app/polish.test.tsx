@@ -61,9 +61,31 @@ it('enlarges exactly the current cube and closes through cancel and button', asy
   expect(within(dialog).getByRole('img')).toHaveAccessibleName('R U2');
   fireEvent(dialog, new Event('cancel', { bubbles: false, cancelable: true }));
   expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  expect(screen.getByRole('main')).toHaveFocus();
   fireEvent.click(open);
   fireEvent.click(screen.getByRole('button', { name: 'Закрыть' }));
   expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+});
+
+it('returns pointer language selection to the timer while preserving keyboard selection focus', async () => {
+  const fixture = timerApplicationFixture();
+  render(<App {...fixture} />);
+  await screen.findByText('R U2');
+  const language = screen.getByRole('combobox');
+  language.focus();
+  fireEvent.pointerDown(language);
+  fireEvent.change(language, { target: { value: 'en' } });
+  expect(screen.getByRole('main')).toHaveFocus();
+  fireEvent.keyDown(document.activeElement!, { code: 'Space', key: ' ' });
+  expect(fixture.application.getState().timer.status).toBe('holding');
+  fireEvent.keyUp(document.activeElement!, { code: 'Space', key: ' ' });
+  language.focus();
+  fireEvent.pointerDown(language);
+  fireEvent.keyDown(language, { code: 'ArrowUp', key: 'ArrowUp' });
+  fireEvent.change(language, { target: { value: 'ru' } });
+  expect(language).toHaveFocus();
+  fireEvent.keyDown(language, { code: 'Space', key: ' ' });
+  expect(fixture.application.getState().timer.status).toBe('idle');
 });
 
 it('edits historical notes and penalties independently, then deletes older and displayed results', async () => {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { TimerApplication } from '../../application/timer';
 import type { TimerClock } from '../../domain/timer';
 import { formatSolveTime } from '../../domain/solves';
@@ -21,6 +21,8 @@ export function TimerPage({
 }) {
   const state = useTimerApplication(application);
   const { t, language, setLanguage } = useLanguage();
+  const timerFocusRef = useRef<HTMLElement>(null);
+  const languagePointerSelection = useRef(false);
   const [cubeOpen, setCubeOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const selected = state.solves.find((solve) => solve.id === selectedId);
@@ -68,16 +70,29 @@ export function TimerPage({
           <span className="sr-only">{t('Language')}</span>
           <select
             value={language}
-            onChange={(event) =>
-              setLanguage(event.target.value === 'en' ? 'en' : 'ru')
-            }
+            onPointerDown={() => {
+              languagePointerSelection.current = true;
+            }}
+            onKeyDown={() => {
+              languagePointerSelection.current = false;
+            }}
+            onBlur={() => {
+              languagePointerSelection.current = false;
+            }}
+            onChange={(event) => {
+              setLanguage(event.target.value === 'en' ? 'en' : 'ru');
+              if (languagePointerSelection.current) {
+                timerFocusRef.current?.focus({ preventScroll: true });
+              }
+              languagePointerSelection.current = false;
+            }}
           >
             <option value="ru">Русский</option>
             <option value="en">English</option>
           </select>
         </label>
       </header>
-      <main>
+      <main ref={timerFocusRef} tabIndex={-1}>
         <h1 className="sr-only">{t('3×3 Timer')}</h1>
         {state.history.status !== 'ready' ? (
           <section className="startup" aria-label={t('Startup')}>
@@ -256,6 +271,7 @@ export function TimerPage({
       {cubeOpen && state.currentScramble && (
         <Dialog
           title={t('Cube after current scramble')}
+          returnFocusRef={timerFocusRef}
           closeOnBackdrop
           onClose={() => setCubeOpen(false)}
         >

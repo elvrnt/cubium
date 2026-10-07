@@ -93,7 +93,7 @@ test('cube opens larger with same scramble, closes with Escape and button, resto
   await expect(dialog).toBeVisible();
   await page.mouse.click(5, 5);
   await expect(dialog).not.toBeVisible();
-  await expect(opener).toBeFocused();
+  await expect(page.getByRole('main')).toBeFocused();
   await opener.click();
   await dialog.getByRole('button', { name: 'Close', exact: true }).click();
   await expect(dialog).not.toBeVisible();

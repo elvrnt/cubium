@@ -55,8 +55,13 @@ stay unchanged. The choice survives reload (see [ARCHITECTURE.md](ARCHITECTURE.m
 
 The inline cube is a labelled button opening the same `CubeVisualization` in a
 larger native modal dialog. Close, Escape and clicks outside the cube dialog's
-bounds dismiss it and restore focus to the
-opener. Recent results are buttons with hover/focus and pressed selection styles.
+bounds dismiss it and move focus to the main timer workspace, so the next Space
+starts a hold instead of reopening the cube. The language selector also returns
+focus there after a pointer selection; keyboard selection retains focus and native
+arrow/Space behavior. The workspace has tabIndex=-1 (programmatically focusable,
+without adding a Tab stop). Buttons remain reachable and operable through Tab.
+Other dialogs retain their normal opener restoration.
+Recent results are buttons with hover/focus and pressed selection styles.
 Selecting one opens a compact details dialog with the stored historical scramble
 as selectable text and reusable result actions. The current scramble/cube never
 changes because of selection. Successful deletion closes the selected editor;
