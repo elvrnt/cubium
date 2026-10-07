@@ -123,4 +123,11 @@ it('deleting B leaves A in history but never shows A as the central result', asy
   await act(() => fixture.application.deleteSolve('b'));
   expect(screen.getByTestId('recent-solve')).toHaveTextContent('13.000');
   expect(screen.getByRole('timer')).toHaveTextContent('0.000');
+  expect(
+    screen.queryByRole('button', { name: 'Заметка' }),
+  ).not.toBeInTheDocument();
+  expect(screen.queryByText('Результат')).not.toBeInTheDocument();
+  expect(
+    screen.queryByText('Начните первую сборку, удерживая пробел.'),
+  ).not.toBeInTheDocument();
 });

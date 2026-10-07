@@ -30,7 +30,8 @@ both text (Idle/Holding/Ready/Running/Stopped) and color.
 `ResultActions`. Statistics use coordinator values and domain formatting: numeric
 time, DNF, or an em dash. Scramble/cube input comes only from currentScramble.
 The idle readout retains the independently tracked displayed result. Deleting it
-shows 0.000 even when older history remains. Compact actions identify their target
+shows 0.000 even when older history remains, and hides the result caption and
+action buttons. There is no first-solve hint under the timer. Compact actions identify their target
 by its formatted result. +2 and DNF buttons toggle to NONE when
 already selected, or select that single penalty otherwise.
 
@@ -53,7 +54,8 @@ labels and messages, while notation, numeric results, +2, DNF and ao abbreviatio
 stay unchanged. The choice survives reload (see [ARCHITECTURE.md](ARCHITECTURE.md)).
 
 The inline cube is a labelled button opening the same `CubeVisualization` in a
-larger native modal dialog. Close and Escape dismiss it and restore focus to the
+larger native modal dialog. Close, Escape and clicks outside the cube dialog's
+bounds dismiss it and restore focus to the
 opener. Recent results are buttons with hover/focus and pressed selection styles.
 Selecting one opens a compact details dialog with the stored historical scramble
 as selectable text and reusable result actions. The current scramble/cube never

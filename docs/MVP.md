@@ -113,7 +113,7 @@ During the solve:
 
 ### Stopping
 
-When the timer is running, pressing Space stops it.
+When the timer is running, pressing any keyboard key stops it.
 
 Ignore auto-repeat keyboard events.
 

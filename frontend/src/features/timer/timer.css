@@ -123,11 +123,6 @@
 .timer-readout[data-state='running'] {
   color: #fff;
 }
-.timer-empty-hint {
-  color: var(--muted);
-  font-size: 12px;
-  margin-top: 36px;
-}
 .timer-cube {
   min-width: 0;
 }

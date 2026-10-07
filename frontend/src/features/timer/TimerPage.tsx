@@ -41,7 +41,9 @@ export function TimerPage({
     if (editing || cubeOpen || selected) return;
     return attachTimerKeyboard(application, clock, setActionError);
   }, [application, clock, editing, cubeOpen, selected]);
-  const latest = state.solves.at(-1);
+  const displayed = state.solves.find(
+    (solve) => solve.id === state.displayedSolveId,
+  );
   const busy =
     state.persistence.status !== 'idle' ||
     !['idle', 'stopped'].includes(state.timer.status);
@@ -139,20 +141,16 @@ export function TimerPage({
                 tabIndex={0}
               >
                 <TimerDisplay application={application} state={state} />
-                {latest ? (
+                {displayed && (
                   <ResultActions
-                    key={latest.id}
+                    key={displayed.id}
                     application={application}
-                    solve={latest}
+                    solve={displayed}
                     persistence={state.persistence}
                     disabled={busy}
                     onEditingChange={setEditing}
                     onError={setActionError}
                   />
-                ) : (
-                  <p className="timer-empty-hint">
-                    {t('Your first solve starts with Space.')}
-                  </p>
                 )}
               </section>
               <aside className="timer-cube" aria-label={t('Scrambled cube')}>
@@ -252,12 +250,13 @@ export function TimerPage({
         )}
       </main>
       <footer className="site-footer">
-        <span>{t('Hold Space · release to start · press to stop')}</span>
+        <span>{t('Hold Space · release to start · any key to stop')}</span>
         <span>{t('Local-first speedcubing')}</span>
       </footer>
       {cubeOpen && state.currentScramble && (
         <Dialog
           title={t('Cube after current scramble')}
+          closeOnBackdrop
           onClose={() => setCubeOpen(false)}
         >
           <CubeVisualization

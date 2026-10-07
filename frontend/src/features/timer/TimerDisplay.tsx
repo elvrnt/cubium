@@ -42,8 +42,8 @@ export function TimerDisplay({
       : t('Idle · Waiting to start'),
     holding: t('Holding · Keep holding Space'),
     ready: t('Ready · Release Space to start'),
-    running: t('Running · Press Space to stop'),
-    stopped: t('Stopped · Release Space'),
+    running: t('Running · Press any key to stop'),
+    stopped: t('Stopped · Release the key'),
   };
   const restingResult = pending ?? displayed;
   return (

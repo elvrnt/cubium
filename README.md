@@ -170,7 +170,7 @@ Formatting belongs to the presentation layer.
 Frontend and backend must be independently runnable during development.
 
 The default page is a working 3×3 Timer MVP: hold Space for 300 ms, release to
-start, and press Space to stop. Select any recent solve to inspect its original
+start, and press any keyboard key to stop. Select any recent solve to inspect its original
 scramble and edit +2/DNF, a note (up to 300 characters), or delete it. Deleting
 the displayed result resets the readout to zero without selecting an older time.
 Click the cube to enlarge it. Russian is the default language; the RU/EN selector

@@ -20,8 +20,6 @@ const russian = {
   'Could not generate a scramble. Your saved solves are safe.':
     'Не удалось создать скрамбл. Сохранённые сборки в безопасности.',
   'Retry scramble': 'Создать скрамбл снова',
-  'Your first solve starts with Space.':
-    'Начните первую сборку, удерживая пробел.',
   'Scrambled cube': 'Перемешанный куб',
   'Waiting for scramble': 'Ожидание скрамбла',
   'State after the scramble': 'Состояние после скрамбла',
@@ -39,16 +37,17 @@ const russian = {
   'Has note': 'Есть заметка',
   'No solves yet. Take your time.':
     'Сборок пока нет. Начните, когда будете готовы.',
-  'Hold Space · release to start · press to stop':
-    'Удерживайте пробел · отпустите для старта · нажмите для остановки',
+  'Hold Space · release to start · any key to stop':
+    'Удерживайте пробел · отпустите для старта · любая клавиша для остановки',
   'Local-first speedcubing': 'Спидкубинг с локальным хранением',
   'Idle · Hold Space to get ready':
     'Ожидание · Удерживайте пробел для подготовки',
   'Idle · Waiting to start': 'Ожидание · Подготовка к старту',
   'Holding · Keep holding Space': 'Подготовка · Продолжайте удерживать пробел',
   'Ready · Release Space to start': 'Готово · Отпустите пробел для старта',
-  'Running · Press Space to stop': 'Сборка · Нажмите пробел для остановки',
-  'Stopped · Release Space': 'Остановлено · Отпустите пробел',
+  'Running · Press any key to stop':
+    'Сборка · Нажмите любую клавишу для остановки',
+  'Stopped · Release the key': 'Остановлено · Отпустите клавишу',
   'Solve time': 'Время сборки',
   Statistics: 'Статистика',
   best: 'лучшее',

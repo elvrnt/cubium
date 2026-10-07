@@ -22,7 +22,7 @@ export function attachTimerKeyboard(
   clock: TimerClock,
   onError: (error: unknown) => void,
 ) {
-  let ownsPress = false;
+  let ownedKey: string | null = null;
   let timeout: number | undefined;
   let scheduledHold: number | undefined;
   const dispatch = (event: TimerEvent) => {
@@ -73,7 +73,7 @@ export function attachTimerKeyboard(
     event.composedPath().some(ignoresTimerShortcut) ||
     ignoresTimerShortcut(event.target);
   const cancelPress = () => {
-    ownsPress = false;
+    ownedKey = null;
     clearHold();
     const status = application.getState().timer.status;
     if (status === 'holding' || status === 'ready')
@@ -82,6 +82,14 @@ export function attachTimerKeyboard(
       dispatch({ type: 'STOP_KEY_UP', now: clock.now() });
   };
   const keydown = (event: KeyboardEvent) => {
+    const state = application.getState();
+    if (state.timer.status === 'running') {
+      event.preventDefault();
+      if (event.repeat || ownedKey !== null) return;
+      ownedKey = event.code || event.key;
+      dispatch({ type: 'STOP_KEY_DOWN', now: clock.now() });
+      return;
+    }
     if (
       event.code !== 'Space' ||
       event.altKey ||
@@ -91,24 +99,20 @@ export function attachTimerKeyboard(
     )
       return;
     event.preventDefault();
-    if (event.repeat || ownsPress) return;
-    const state = application.getState();
-    if (state.timer.status === 'running') {
-      ownsPress = true;
-      dispatch({ type: 'STOP_KEY_DOWN', now: clock.now() });
-    } else if (state.canArm) {
-      ownsPress = true;
+    if (event.repeat || ownedKey !== null) return;
+    if (state.canArm) {
+      ownedKey = event.code;
       dispatch({ type: 'START_KEY_DOWN', now: clock.now() });
     }
   };
   const keyup = (event: KeyboardEvent) => {
-    if (event.code !== 'Space' || !ownsPress) return;
+    if (ownedKey === null || (event.code || event.key) !== ownedKey) return;
     if (targetIsProtected(event)) {
       cancelPress();
       return;
     }
     event.preventDefault();
-    ownsPress = false;
+    ownedKey = null;
     clearHold();
     const status = application.getState().timer.status;
     dispatch({
@@ -117,7 +121,7 @@ export function attachTimerKeyboard(
     });
   };
   const focusin = (event: FocusEvent) => {
-    if (ownsPress && ignoresTimerShortcut(event.target)) cancelPress();
+    if (ownedKey !== null && ignoresTimerShortcut(event.target)) cancelPress();
   };
   const visibility = () => {
     if (document.hidden) cancelPress();

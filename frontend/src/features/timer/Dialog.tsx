@@ -7,10 +7,12 @@ export function Dialog({
   title,
   onClose,
   children,
+  closeOnBackdrop = false,
 }: {
   title: string;
   onClose: () => void;
   children: ReactNode;
+  closeOnBackdrop?: boolean;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
   const titleId = useId();
@@ -30,6 +32,17 @@ export function Dialog({
       className="timer-dialog"
       aria-labelledby={titleId}
       data-timer-shortcuts="off"
+      onClick={(event) => {
+        if (!closeOnBackdrop || event.target !== event.currentTarget) return;
+        const bounds = event.currentTarget.getBoundingClientRect();
+        if (
+          event.clientX < bounds.left ||
+          event.clientX > bounds.right ||
+          event.clientY < bounds.top ||
+          event.clientY > bounds.bottom
+        )
+          onClose();
+      }}
       onCancel={(event) => {
         event.preventDefault();
         onClose();

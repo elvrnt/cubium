@@ -76,6 +76,34 @@ describe('keyboard controller', () => {
     expect(fixture.application.getState().timer.status).toBe('idle');
   });
 
+  it.each(['KeyA', 'Enter', 'Escape', 'ShiftLeft', 'ArrowDown'])(
+    'stops with %s, ignores repeat and waits for that key to be released',
+    async (code) => {
+      key('keydown');
+      fixture.setTime(300);
+      vi.advanceTimersByTime(300);
+      key('keyup');
+      fixture.setTime(1500);
+      window.dispatchEvent(
+        new KeyboardEvent('keydown', { code, repeat: true }),
+      );
+      expect(fixture.application.getState().timer.status).toBe('running');
+      const stop = new KeyboardEvent('keydown', { code, cancelable: true });
+      window.dispatchEvent(stop);
+      expect(stop.defaultPrevented).toBe(true);
+      expect(fixture.application.getState().timer.status).toBe('stopped');
+      key('keyup');
+      expect(fixture.application.getState().timer.status).toBe('stopped');
+      window.dispatchEvent(new KeyboardEvent('keyup', { code }));
+      await vi.runAllTimersAsync();
+      expect(fixture.application.getState().timer.status).toBe('idle');
+      expect(fixture.repository.save).toHaveBeenCalledTimes(1);
+      expect(fixture.application.getState().solves[0]?.rawTimeMs).toBe(1200);
+      window.dispatchEvent(new KeyboardEvent('keydown', { code }));
+      expect(fixture.application.getState().timer.status).toBe('idle');
+    },
+  );
+
   it('reschedules an early timeout based on the domain response', () => {
     key('keydown');
     fixture.setTime(299);

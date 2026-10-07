@@ -48,7 +48,7 @@ The committed npm lockfile supports reproducible frontend installs.
 ### Timer verification
 
 Open `/` for the production Timer screen. Hold Space until Ready, release to
-start, then press/release Space to stop. Recent results and statistics update after
+start, then press/release any keyboard key to stop. Recent results and statistics update after
 local save. Note/+2/DNF/Delete target the result identified by the action caption;
 select any recent result to edit its historical record. Reload to verify history,
 penalties and notes persist. Space in editors and on focused buttons keeps native

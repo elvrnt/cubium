@@ -186,9 +186,11 @@ disposal. Strict Mode effect replay never creates a second runtime. The thin
 only an uninitialized coordinator; subscriptions are cleaned up on unmount.
 
 `features/timer/keyboardController.ts` owns browser listeners and hold timeouts.
-Space down maps idle/canArm to START_KEY_DOWN or running to STOP_KEY_DOWN; only
-the release of an owned press maps back to START_KEY_UP/STOP_KEY_UP. Repeats and
-duplicate downs are ignored. Handled Space prevents scrolling. Text inputs,
+Space down maps idle/canArm to START_KEY_DOWN. While running, any keyboard keydown
+maps to STOP_KEY_DOWN and suppresses its default action, including when focus has
+moved to a control. Only the release of that owned key maps back to
+START_KEY_UP/STOP_KEY_UP. Repeats and duplicate downs are ignored. Handled keys
+prevent default browser actions. Outside running, text inputs,
 textarea, select, contenteditable, buttons, links and marked editor regions retain
 native keyboard behavior. The entire timer shortcut adapter is suspended while
 the note editor or delete confirmation is open.
@@ -197,7 +199,7 @@ The scheduler captures holdStartedAt and uses DEFAULT_HOLD_THRESHOLD_MS; it
 cancels when holding ends. Early callbacks are rescheduled only if the domain
 still reports holding. Blur, hidden documents, entering an editor while holding,
 and cleanup cancel holding/ready via CANCEL_HOLD, so a late release cannot start
-a solve. Running time continues across blur; returning and pressing Space stops
+a solve. Running time continues across blur; returning and pressing any key stops
 normally. All listeners and timeouts are removed during cleanup.
 
 `TimerDisplay` mounts its local animation-frame component only while running.
@@ -209,6 +211,8 @@ show zero when it is null. A new completion selects its new ID before saving;
 an unsaved result remains visible from the pending record. Successful deletion
 clears that ID only when it matches the deleted solve, so the readout never falls
 back to older history. Failed deletion retains it until a successful retry.
+The action caption and buttons use the same displayed ID and disappear when it
+is cleared; older records remain accessible through the recent-history buttons.
 Editing/deleting a different historical solve leaves it unchanged. On a fresh
 page load the latest durable solve is selected initially (or zero with no history);
 the display identity and historical editor selection are not persisted. Timer

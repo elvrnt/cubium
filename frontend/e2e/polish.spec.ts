@@ -12,6 +12,24 @@ async function openEnglish(page: Page) {
   await page.getByRole('combobox').selectOption('en');
   await ready(page);
 }
+
+test('stops with different keyboard keys and can start the next solve', async ({
+  page,
+}) => {
+  await openEnglish(page);
+  let count = 0;
+  for (const key of ['a', 'Enter', 'Escape']) {
+    await ready(page);
+    await page.getByRole('timer').click();
+    await page.keyboard.down('Space');
+    await expect(page.locator('.timer-readout__status')).toContainText('Ready');
+    await page.keyboard.up('Space');
+    await expect(page.getByRole('timer')).not.toHaveText('0.000');
+    await page.keyboard.press(key);
+    await ready(page);
+    await expect(page.getByTestId('recent-solve')).toHaveCount(++count);
+  }
+});
 async function solve(page: Page) {
   await ready(page);
   const scramble = await page.getByTestId('scramble').innerText();
@@ -70,6 +88,11 @@ test('cube opens larger with same scramble, closes with Escape and button, resto
   expect(enlarged!.width).toBeGreaterThan(inline!.width * 2);
   await page.keyboard.press('Escape');
   await expect(dialog).not.toBeVisible();
+  await opener.click();
+  await dialog.getByRole('heading').click();
+  await expect(dialog).toBeVisible();
+  await page.mouse.click(5, 5);
+  await expect(dialog).not.toBeVisible();
   await expect(opener).toBeFocused();
   await opener.click();
   await dialog.getByRole('button', { name: 'Close', exact: true }).click();
@@ -88,6 +111,12 @@ test('deleting displayed B keeps A but resets main readout; a new solve displays
   await expect(page.getByTestId('recent-solve')).toHaveCount(1);
   await expect(page.getByTestId('recent-solve')).toHaveText(a);
   await expect(page.getByRole('timer')).toHaveText('0.000');
+  await expect(page.getByRole('region', { name: 'Solve actions' })).toHaveCount(
+    0,
+  );
+  await expect(
+    page.getByText('Your first solve starts with Space.'),
+  ).toHaveCount(0);
   await solve(page);
   await expect(page.getByTestId('recent-solve')).toHaveCount(2);
   await expect(page.getByRole('timer')).toHaveText(
