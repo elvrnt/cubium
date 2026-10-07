@@ -88,6 +88,36 @@ test('Space retains button activation, clicking the time restores hold/start and
   await expect(page.getByTestId('recent-solve')).toHaveCount(2);
 });
 
+test('low-height desktop keeps history and complete keyboard guidance in view', async ({
+  page,
+}) => {
+  for (const size of [
+    { width: 1280, height: 720 },
+    { width: 1024, height: 768 },
+  ]) {
+    await page.setViewportSize({ ...size, height: 900 });
+    const fullHeightFont = await page
+      .getByRole('timer')
+      .evaluate((element) => getComputedStyle(element).fontSize);
+    await page.setViewportSize(size);
+    const history = await page
+      .getByRole('region', { name: 'Recent solves' })
+      .boundingBox();
+    const footer = await page.locator('.site-footer').boundingBox();
+    expect(history!.y).toBeLessThan(600);
+    expect(footer!.y + footer!.height).toBeLessThanOrEqual(size.height);
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    await expect(page.getByRole('timer')).toHaveCSS(
+      'font-size',
+      fullHeightFont,
+    );
+  }
+});
+
 test('mobile pointer focus hint does not shift the help button during activation', async ({
   page,
 }) => {

@@ -83,7 +83,9 @@ and returns to the neutral timer workspace. Timer shortcuts are suspended while
 help is open, and its trigger is disabled during timing or unresolved writes.
 All help and announcements use the existing RU/EN dictionary.
 
-History is explicitly
+At desktop widths above 760px and viewport heights up to 800px, a height-aware
+media query reduces header, scramble, workspace, notice and history spacing.
+The timer's font size and mobile composition are preserved. History is explicitly
 labelled Last 20, and the status instruction uses 14px text.
 Recent results are buttons with hover/focus and pressed selection styles.
 Selecting one opens a compact details dialog with the stored historical scramble
