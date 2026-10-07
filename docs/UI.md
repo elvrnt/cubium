@@ -10,7 +10,7 @@ Primary characteristics:
 - low visual noise;
 - large timer;
 - keyboard-first;
-- dark mode friendly;
+- warm light surface (Light Protocol);
 - information-dense but not cluttered.
 
 Avoid generic dashboard cards surrounding every element.
@@ -19,12 +19,57 @@ Avoid generic dashboard cards surrounding every element.
 
 ### Implemented Timer MVP
 
-The default `/` page uses a quiet dark layout with scramble text above a dominant
-timer, compact statistics on the left, the existing 2D cube on the right, and the
-latest 20 solves below (newest first in presentation only). Navigation contains
-Cubium and Timer. Desktop and laptop layouts use three columns; narrower
-screens place the timer above statistics and cube. State is communicated with
-both text (Idle/Holding/Ready/Running/Stopped) and color.
+The default `/` page uses the Light Protocol design: warm white, ink text and
+cobalt selection/focus (tokens in [DESIGN.md](../DESIGN.md)). Scramble text sits
+above the dominant timer, with the existing 2D cube on its right. Result actions,
+a horizontal six-value statistics strip, the latest 20 solves (newest first in
+presentation only) and keyboard guidance follow. Navigation contains Cubium and
+Timer. State is communicated with text and color.
+
+On desktop the digits' bounding box is centered in the initial viewport, rather
+than in the remaining space beside the cube. Status and result actions never
+shift that anchor. The timer scrolls with the ordinary page when reading lower
+content; it is not an overlay covering history. At widths up to 760px or heights
+up to 640px the ordinary interface flows vertically. A ResizeObserver also
+chooses flowing layout when header, scramble and enlarged text leave insufficient
+space above the digits. Long times fit their container without wrapping.
+
+### Typography: Sports Stopwatch
+
+The approved typography refinement retains Light Protocol and the existing
+composition. Locally bundled Golos Text is used for interface copy (400),
+controls and timer/statistic values (500), and section titles (600). Numeric
+results use lining tabular figures in the renamed Cubium Golos Numeric derivatives.
+Their equal advances correct unequal upstream tnum glyph widths without changing
+the digit shapes. Kerning is off for measurements. The timer keeps its existing
+size, fitting rule and centered anchor, with normal tracking. Current and historical scramble
+notation uses IBM Plex Mono Regular (400), normal tracking and no ligatures.
+
+Primary copy has a 16px base, controls/instructions use 15px, supporting labels
+use 13px, statistics use 20px and recent times use 18px. Copy sizes use rem to
+respect the browser's default text size. Latin and Cyrillic assets ship with the
+app; fonts load from the same origin without a CDN or new dependency. Preloads,
+swap and system fallbacks keep text available on a delayed or failed font request.
+Sources, exact asset hashes and SIL OFL licenses are in `frontend/public/fonts`.
+
+### Concentration while running
+
+Only `timer.status === 'running'` activates concentration. Holding and Ready keep
+the complete interface visible. Running shows only the digits on the same light
+surface, fixed at the viewport center with the same desktop size. Chrome remains
+mounted but has `visibility: hidden`, `inert` and `aria-hidden`; its controls
+cannot receive focus. The state instruction becomes visually hidden and remains
+available to assistive technology. `role="timer"` and `aria-live="off"` remain.
+
+The presentation hook locks scrolling while retaining the workspace's dimensions,
+previous overflow style and scroll position. It focuses the neutral timer section
+without scrolling. Stop keydown immediately restores the interface, independently
+of keyup, saving and next-scramble generation. The existing key controller still
+owns release/repeat behavior. Cleanup restores scrolling on stop and unmount.
+There is no Fullscreen API, animated movement, second frame loop, application
+state, clock or persistence change.
+
+### Existing MVP behavior
 
 `TimerPage` composes `TimerDisplay`, `StatisticsPanel`, `CubeVisualization` and
 `ResultActions`. Statistics use coordinator values and domain formatting: numeric
@@ -83,10 +128,9 @@ and returns to the neutral timer workspace. Timer shortcuts are suspended while
 help is open, and its trigger is disabled during timing or unresolved writes.
 All help and announcements use the existing RU/EN dictionary.
 
-At desktop widths above 760px and viewport heights up to 800px, a height-aware
-media query reduces header, scramble, workspace, notice and history spacing.
-The timer's font size and mobile composition are preserved. History is explicitly
-labelled Last 20, and the status instruction uses 14px text.
+All main controls provide at least 44px targets and a cobalt focus outline.
+The page has no minimum body width, so 320px screens can reflow without horizontal
+scrolling. History is explicitly labelled Last 20; state instructions use 15px text.
 Recent results are buttons with hover/focus and pressed selection styles.
 Selecting one opens a compact details dialog with the stored historical scramble
 as selectable text and reusable result actions. The current scramble/cube never
@@ -98,21 +142,18 @@ Desktop concept:
 
 ```text
 ┌───────────────────────────────────────────────────────────────┐
-│ Cubium       Timer    BLD    Algorithms          Profile │
+│ Cubium       Timer                         Language           │
 ├───────────────────────────────────────────────────────────────┤
 │                                                               │
 │                   R U2 F' L2 D R2 ...                         │
 │                                                               │
 │                                                               │
-│  BEST      11.203                                             │
-│  MEAN      13.812                   ┌─────────────────────┐    │
-│  AO5       12.944                   │                     │    │
-│  AO12      13.215         12.483    │     2D CUBE         │    │
-│  AO100     13.591                   │                     │    │
-│                                      └─────────────────────┘    │
+│                         12.483              2D CUBE           │
 │                                                               │
 │                         Note  +2  DNF  Delete                  │
 │                                                               │
+├───────────────────────────────────────────────────────────────┤
+│ best      mean      ao5      ao12      ao50      ao100          │
 ├───────────────────────────────────────────────────────────────┤
 │ Recent                                                        │
 │                                                               │
@@ -157,9 +198,8 @@ Do not rely exclusively on color; subtle text/icon/state changes are acceptable.
 
 ### Running
 
-The timer remains readable.
-
-Actions for the previous result should not interfere with stopping.
+Only the timer digits remain visible; the state instruction remains accessible
+to screen readers. All other controls are inert until stop keydown.
 
 ### Stopped
 

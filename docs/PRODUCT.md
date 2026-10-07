@@ -83,16 +83,22 @@ navigation
 
 scramble
 
-                timer
-
-statistics                  cube visualization
+                timer                  cube visualization
 
 timer actions
+
+horizontal statistics
 
 recent solves
 ```
 
 The timer should visually dominate the page.
+
+The Timer uses the Light Protocol appearance. On ordinary desktop screens its
+digits occupy the viewport center. Compact screens prioritize flowing content
+without overlaps. During a running solve only the centered timer is visible;
+the complete interface returns immediately when a key stops the solve. This is
+a presentation mode, with no change to timing, saving or keyboard semantics.
 
 ### Scramble
 
@@ -112,7 +118,8 @@ Use `cubing.js` where practical.
 
 ### Statistics
 
-Statistics appear to the left of the timer on desktop.
+Statistics appear in a compact horizontal strip below the timer on desktop,
+reflowing into rows on compact screens.
 
 Initial statistics:
 

@@ -1,0 +1,235 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-07T18:12:32.668Z",
+  "title": "Design System: Cubium — Light Protocol",
+  "extensions": {
+    "colorMeta": {
+      "surface": {
+        "role": "neutral",
+        "displayName": "Warm Paper"
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Dark Ink"
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Slate Copy"
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Fine Rule"
+      },
+      "control-border": {
+        "role": "neutral",
+        "displayName": "Control Stroke"
+      },
+      "accent": {
+        "role": "primary",
+        "displayName": "Protocol Cobalt"
+      },
+      "accent-soft": {
+        "role": "primary",
+        "displayName": "Soft Cobalt"
+      },
+      "ready": {
+        "role": "state",
+        "displayName": "Readiness Green"
+      },
+      "holding": {
+        "role": "state",
+        "displayName": "Hold Amber"
+      },
+      "danger": {
+        "role": "state",
+        "displayName": "Delete Red"
+      },
+      "surface-raised": {
+        "role": "neutral",
+        "displayName": "Raised Paper"
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Timer Measurement",
+        "purpose": "Dominant Cubium Golos Numeric medium readout; equal-width lining/tabular digits, no kerning, and character-count/container fit."
+      },
+      "scramble": {
+        "displayName": "Cube Notation",
+        "purpose": "IBM Plex Mono regular cube notation with move-boundary wrapping."
+      },
+      "body": {
+        "displayName": "Interface Copy",
+        "purpose": "Golos Text controls, timing instructions and note editor in rem sizes."
+      },
+      "label": {
+        "displayName": "Compact Label",
+        "purpose": "Section labels and small supporting copy."
+      },
+      "title": {
+        "displayName": "Section Title",
+        "purpose": "Recent history heading."
+      },
+      "statistic": {
+        "displayName": "Statistic Value",
+        "purpose": "Six compact Cubium Golos Numeric medium measurements with equal-width lining/tabular digits and no kerning."
+      },
+      "history": {
+        "displayName": "Recent Result",
+        "purpose": "Selectable Cubium Golos Numeric regular results with equal-width lining/tabular digits and no kerning."
+      }
+    },
+    "shadows": [
+      {
+        "name": "modal",
+        "value": "0 24px 90px #18232e40",
+        "purpose": "The sole lifted product surface, used by native dialogs."
+      }
+    ],
+    "motion": [
+      {
+        "name": "concentration",
+        "value": "none",
+        "purpose": "Running concentration and stop restoration are immediate, without a transition."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "compact-width",
+        "value": "760px"
+      },
+      {
+        "name": "compact-height",
+        "value": "640px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Secondary Action",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Quiet outlined result and retry actions.",
+      "html": "<button class=\"ds-secondary\" type=\"button\">Note</button>",
+      "css": ".ds-secondary{min-height:44px;min-width:44px;font-family:var(--font-ui, 'Golos Text', system-ui, sans-serif);font-size:0.9375rem;border:1px solid var(--control-border, #7d8791);border-radius:4px;background:transparent;color:var(--ink, #18232e);padding:8px 14px;cursor:pointer;}.ds-secondary:hover:not(:disabled){background:var(--accent-soft, #e5eafa);border-color:var(--accent, #244ac7)}.ds-secondary:focus-visible{outline:2px solid var(--accent, #244ac7);outline-offset:4px}.ds-secondary:disabled{opacity:.5;cursor:not-allowed}"
+    },
+    {
+      "name": "Selected Penalty",
+      "kind": "button",
+      "refersTo": "button-selected",
+      "description": "Existing pressed state for a penalty action.",
+      "html": "<button class=\"ds-selected\" type=\"button\" aria-pressed=\"true\">+2</button>",
+      "css": ".ds-selected{min-height:44px;min-width:44px;font-family:var(--font-ui, 'Golos Text', system-ui, sans-serif);font-size:0.9375rem;border:1px solid var(--control-border, #7d8791);border-radius:4px;background:transparent;color:var(--ink, #18232e);padding:8px 14px;cursor:pointer;color:var(--surface-raised, #fffdf8);background:var(--accent, #244ac7);border-color:var(--accent, #244ac7)}.ds-selected:hover:not(:disabled){color:var(--surface-raised, #fffdf8);background:var(--accent, #244ac7);border-color:var(--accent, #244ac7)}.ds-selected:focus-visible{outline:2px solid var(--accent, #244ac7);outline-offset:4px}.ds-selected:disabled{opacity:.5;cursor:not-allowed}"
+    },
+    {
+      "name": "Delete Confirmation",
+      "kind": "button",
+      "refersTo": "button-danger",
+      "description": "Destructive confirmation in the compact inline editor.",
+      "html": "<button class=\"ds-danger\" type=\"button\">Confirm delete</button>",
+      "css": ".ds-danger{min-height:44px;min-width:44px;font-family:var(--font-ui, 'Golos Text', system-ui, sans-serif);font-size:0.9375rem;border:1px solid var(--control-border, #7d8791);border-radius:4px;background:transparent;color:var(--ink, #18232e);padding:8px 14px;cursor:pointer;color:var(--danger, #a02d34)}.ds-danger:hover:not(:disabled){background:var(--accent-soft, #e5eafa);border-color:var(--accent, #244ac7)}.ds-danger:focus-visible{outline:2px solid var(--accent, #244ac7);outline-offset:4px}.ds-danger:disabled{opacity:.5;cursor:not-allowed}"
+    },
+    {
+      "name": "Note Field",
+      "kind": "input",
+      "refersTo": "note-field",
+      "description": "Raised-paper note field and its existing character counter.",
+      "html": "<div class=\"ds-note\"><label for=\"ds-solve-note\">Note for solve</label><textarea id=\"ds-solve-note\" rows=\"3\" maxlength=\"300\" aria-describedby=\"ds-note-count\"></textarea><p id=\"ds-note-count\">Characters used: 0 / 300</p></div>",
+      "css": ".ds-note{max-width:400px;padding:16px;border:1px solid var(--line, #cbd0d1);border-radius:4px;font:400 0.9375rem/1.5 var(--font-ui, 'Golos Text', system-ui, sans-serif);color:var(--ink, #18232e)}.ds-note label{display:block;margin-bottom:8px}.ds-note textarea{width:100%;box-sizing:border-box;resize:vertical;background:var(--surface-raised, #fffdf8);color:var(--ink, #18232e);border:1px solid var(--control-border, #7d8791);border-radius:4px;padding:10px;font:inherit;line-height:1.5;caret-color:var(--accent, #244ac7)}.ds-note textarea:focus-visible{outline:2px solid var(--accent, #244ac7);outline-offset:4px}.ds-note p{font-size:0.8125rem;color:var(--muted, #596470)}"
+    },
+    {
+      "name": "Language Selector",
+      "kind": "input",
+      "refersTo": "language-select",
+      "description": "Native labelled RU/EN selection; labels remain in the existing dictionary.",
+      "html": "<label class=\"ds-language\"><span class=\"ds-sr-only\">Language</span><select><option>Русский</option><option>English</option></select></label>",
+      "css": ".ds-language{font-family:var(--font-ui, 'Golos Text', system-ui, sans-serif)}.ds-language select{min-height:44px;max-width:100%;padding:8px;border:1px solid var(--control-border, #7d8791);border-radius:4px;background:var(--surface, #f5f3ec);color:var(--ink, #18232e);font:inherit;font-size:0.9375rem}.ds-language select:focus-visible{outline:2px solid var(--accent, #244ac7);outline-offset:4px}.ds-sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}"
+    },
+    {
+      "name": "Cubium Navigation",
+      "kind": "nav",
+      "description": "Compact ruled header with the actual SVG cube-grid mark and active Timer link.",
+      "html": "<header class=\"ds-header\"><a class=\"ds-brand\" href=\"/\" aria-label=\"Cubium home\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" aria-hidden=\"true\"><rect x=\"2\" y=\"2\" width=\"20\" height=\"20\"/><path d=\"M8.67 2v20M15.33 2v20M2 8.67h20M2 15.33h20\"/></svg>Cubium</a><nav aria-label=\"Main navigation\"><a class=\"ds-active\" href=\"/\" aria-current=\"page\">Timer</a></nav></header>",
+      "css": ".ds-header{display:flex;align-items:center;gap:40px;min-height:64px;border-bottom:1px solid var(--line, #cbd0d1);font-family:var(--font-ui, 'Golos Text', system-ui, sans-serif)}.ds-brand{display:inline-flex;align-items:center;gap:10px;min-height:44px;color:var(--ink, #18232e);font-size:1.25rem;font-weight:600;letter-spacing:-.02em;text-decoration:none}.ds-brand svg{color:var(--accent, #244ac7)}.ds-active{display:flex;align-items:center;min-height:62px;color:var(--accent, #244ac7);text-decoration:none;border-bottom:2px solid var(--accent, #244ac7);font-size:0.9375rem}.ds-header a:focus-visible{outline:2px solid var(--accent, #244ac7);outline-offset:4px}@media(max-width:760px){.ds-header{gap:16px;flex-wrap:wrap}.ds-active{min-height:44px}}"
+    },
+    {
+      "name": "Timer Readout",
+      "kind": "custom",
+      "refersTo": "timer-readout",
+      "description": "Static idle readout example, with the actual measurement fit and written state instruction. Runtime concentration remains in the product code.",
+      "html": "<section class=\"ds-readout\" tabindex=\"0\" aria-label=\"Timer\" style=\"--time-characters:6\"><div class=\"ds-time\" role=\"timer\" aria-label=\"Solve time\" aria-live=\"off\">12.483</div><p class=\"ds-state\" role=\"status\">Idle · Hold Space to get ready</p></section>",
+      "css": ".ds-readout{min-width:0;container-type:inline-size;text-align:center;color:var(--ink, #18232e)}.ds-time{font-size:min(clamp(64px,10vw,144px),calc(100cqi / var(--time-characters) * 1.6));font-family:var(--font-numeric, 'Cubium Golos Numeric', system-ui, sans-serif);font-weight:500;font-variant-numeric:lining-nums tabular-nums;font-kerning:none;letter-spacing:normal;line-height:1;white-space:nowrap}.ds-state{color:var(--muted, #596470);font:400 0.9375rem/1.5 var(--font-ui, 'Golos Text', system-ui, sans-serif);line-height:1.5;min-height:21px;margin:16px 0 0}.ds-readout:focus-visible{outline:2px solid var(--accent, #244ac7);outline-offset:4px}"
+    },
+    {
+      "name": "Statistics Strip",
+      "kind": "custom",
+      "description": "Flat six-value statistic strip with cobalt best and the actual inline help SVG.",
+      "html": "<aside class=\"ds-statistics\" aria-label=\"Statistics\"><div class=\"ds-stat-heading\"><h2>Statistics</h2><button class=\"ds-stat-info\" type=\"button\" aria-label=\"About statistics\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 11v6M12 7v1\"/></svg></button></div><dl><div><dt>best</dt><dd>12.483</dd></div><div><dt>mean</dt><dd>13.205</dd></div><div><dt>ao5</dt><dd>—</dd></div><div><dt>ao12</dt><dd>—</dd></div><div><dt>ao50</dt><dd>—</dd></div><div><dt>ao100</dt><dd>—</dd></div></dl></aside>",
+      "css": ".ds-statistics{display:flex;align-items:center;gap:24px;border-top:1px solid var(--line, #cbd0d1);padding:8px 0;font-family:var(--font-ui, 'Golos Text', system-ui, sans-serif);color:var(--ink, #18232e)}.ds-stat-heading{display:flex;align-items:center;gap:8px}.ds-stat-heading h2{color:var(--muted, #596470);font-size:0.8125rem;font-weight:500;margin:0}.ds-stat-info{min-height:44px;min-width:44px;font-family:var(--font-ui, 'Golos Text', system-ui, sans-serif);font-size:0.9375rem;border:1px solid var(--control-border, #7d8791);border-radius:4px;background:transparent;color:var(--ink, #18232e);padding:8px 14px;cursor:pointer;display:grid;place-items:center;padding:8px;border-color:transparent;color:var(--muted, #596470)}.ds-stat-info:hover:not(:disabled){background:var(--accent-soft, #e5eafa);border-color:var(--accent, #244ac7)}.ds-stat-info:focus-visible{outline:2px solid var(--accent, #244ac7);outline-offset:4px}.ds-stat-info:disabled{opacity:.5;cursor:not-allowed}.ds-statistics dl{flex:1;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:16px;margin:0}.ds-statistics dt{font-size:0.8125rem;color:var(--muted, #596470);margin-bottom:4px}.ds-statistics dd{margin:0;font-family:var(--font-numeric, 'Cubium Golos Numeric', system-ui, sans-serif);font-size:1.25rem;font-weight:500;font-variant-numeric:lining-nums tabular-nums;font-kerning:none;overflow-wrap:anywhere}.ds-statistics dl>div:first-child dd{color:var(--accent, #244ac7)}@media(max-width:760px),(max-height:640px){.ds-statistics{flex-direction:column;align-items:stretch;gap:12px}.ds-statistics dl{grid-template-columns:repeat(3,minmax(0,1fr))}}"
+    },
+    {
+      "name": "Recent Result",
+      "kind": "button",
+      "refersTo": "recent-result",
+      "description": "Selectable time in the wrapping recent-history list.",
+      "html": "<button class=\"ds-recent\" type=\"button\" aria-pressed=\"false\">12.483</button>",
+      "css": ".ds-recent{min-height:44px;min-width:44px;font-family:var(--font-ui, 'Golos Text', system-ui, sans-serif);font-size:0.9375rem;border:1px solid var(--control-border, #7d8791);border-radius:4px;background:transparent;color:var(--ink, #18232e);padding:8px 14px;cursor:pointer;font-family:var(--font-numeric, 'Cubium Golos Numeric', system-ui, sans-serif);font-size:1.125rem;font-weight:400;font-variant-numeric:lining-nums tabular-nums;font-kerning:none;padding:8px 12px;max-width:100%;overflow-wrap:anywhere}.ds-recent:hover:not(:disabled){background:var(--accent-soft, #e5eafa);border-color:var(--accent, #244ac7)}.ds-recent:focus-visible{outline:2px solid var(--accent, #244ac7);outline-offset:4px}.ds-recent:disabled{opacity:.5;cursor:not-allowed}.ds-recent[aria-pressed=true]{color:var(--surface-raised, #fffdf8);background:var(--accent, #244ac7);border-color:var(--accent, #244ac7)}"
+    },
+    {
+      "name": "Solve Details Dialog",
+      "kind": "custom",
+      "refersTo": "dialog",
+      "description": "Development-only static dialog shell showing existing modal materials; application code owns native focus trapping and dismissal.",
+      "html": "<section class=\"ds-dialog\" role=\"dialog\" aria-labelledby=\"ds-dialog-title\"><header class=\"ds-dialog-header\"><h2 id=\"ds-dialog-title\">Solve details</h2><button class=\"ds-dialog-close\" type=\"button\">Close</button></header><p>Penalty: None</p><h3>Historical scramble</h3><p class=\"ds-dialog-scramble\">R U2 F′ L2 D R2</p></section>",
+      "css": ".ds-dialog{width:min(760px,calc(100vw - 32px));max-height:calc(100svh - 32px);overflow:auto;padding:24px;border:0;border-radius:12px;background:var(--surface-raised, #fffdf8);color:var(--ink, #18232e);box-shadow:0 24px 90px #18232e40;font-family:var(--font-ui, 'Golos Text', system-ui, sans-serif);box-sizing:border-box}.ds-dialog-header{display:flex;align-items:center;justify-content:space-between;gap:20px}.ds-dialog h2{font-size:1.25rem;margin:0}.ds-dialog h3{font-size:0.9375rem;color:var(--muted, #596470);margin-top:28px}.ds-dialog-scramble{font-family:var(--font-notation, 'IBM Plex Mono', ui-monospace, Consolas, monospace);font-weight:400;font-variant-ligatures:none;font-size:18px;line-height:1.65;letter-spacing:normal}.ds-dialog-close{min-height:44px;min-width:44px;font-family:var(--font-ui, 'Golos Text', system-ui, sans-serif);font-size:0.9375rem;border:1px solid var(--control-border, #7d8791);border-radius:4px;background:transparent;color:var(--ink, #18232e);padding:8px 14px;cursor:pointer;}.ds-dialog-close:hover:not(:disabled){background:var(--accent-soft, #e5eafa);border-color:var(--accent, #244ac7)}.ds-dialog-close:focus-visible{outline:2px solid var(--accent, #244ac7);outline-offset:4px}.ds-dialog-close:disabled{opacity:.5;cursor:not-allowed}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Light Protocol",
+    "overview": "Cubium feels like a dedicated competition work surface: warm paper, clear ink, precise measurements and restrained cobalt controls. The timer carries the visual weight; supporting information stays compact and readable. Fine rules organize the surface without a surrounding dashboard of cards.\n\nLocally bundled Golos Text and its Cubium Golos Numeric derivative share a consistent voice across copy and measurements; IBM Plex Mono distinguishes cube notation. State changes are immediate. The approved world uses no decorative imagery or runtime external assets; the live cube is functional domain visualization.",
+    "keyCharacteristics": [
+      "Warm light surface and high-contrast ink.",
+      "Cubium Golos Numeric measurements with lining, tabular numerals and a dominant timer.",
+      "Fine separators, compact labels and generous control targets.",
+      "Cobalt selection and focus; named, readable timing states.",
+      "Immediate concentration and immediate return to the work surface."
+    ],
+    "rules": [
+      {
+        "name": "The Named State Rule",
+        "body": "Pair timing-state color with a written instruction; color alone never identifies Holding or Ready.",
+        "section": "colors"
+      },
+      {
+        "name": "The Measurement Rule",
+        "body": "Keep numeric results in Cubium Golos Numeric with lining, tabular numerals and no kerning; use IBM Plex Mono for cube notation and fit long values within their container without wrapping.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat Work Surface Rule",
+        "body": "Use separators and tonal fill for routine information; reserve the existing shadow and backdrop for modal dialogs.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Immediate Concentration Rule",
+        "body": "Show only centered digits during Running and restore the complete work surface on stop keydown without animated movement.",
+        "section": "components"
+      }
+    ],
+    "dos": [
+      "Do use the exact recorded palette and locally bundled Golos Text, Cubium Golos Numeric and IBM Plex Mono stacks.",
+      "Do keep focus visible and main control targets at least 44px.",
+      "Do express state and penalties in readable text alongside color.",
+      "Do keep measurements tabular and fit long values without wrapping.",
+      "Do use flowing layout when compact screens or enlarged copy require it.",
+      "Do preserve the immediate Running concentration and stop behavior."
+    ],
+    "donts": [
+      "Don't surround routine Timer information with dashboard cards.",
+      "Don't introduce decorative imagery or runtime external font/CDN requests into this approved world.",
+      "Don't add animated movement to concentration or a second timer frame loop.",
+      "Don't use the fine divider token as the stronger interactive-control boundary.",
+      "Don't turn development-only component examples or unused legacy styles into product rules."
+    ]
+  }
+}
