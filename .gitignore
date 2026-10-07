@@ -34,3 +34,14 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Local agent installations and hook settings
+.agents/
+.codex/
+
+# Impeccable run artifacts; keep the shared design contract
+.impeccable/*
+!.impeccable/design.json
+!.impeccable/surfaces/
+.impeccable/surfaces/*
+!.impeccable/surfaces/timer.md
