@@ -23,9 +23,11 @@ function RunningTime({ application }: { application: TimerApplication }) {
 export function TimerDisplay({
   application,
   state,
+  controlFocused = false,
 }: {
   application: TimerApplication;
   state: TimerApplicationState;
+  controlFocused?: boolean;
 }) {
   const { t } = useLanguage();
   const displayed = state.solves.find(
@@ -64,7 +66,9 @@ export function TimerDisplay({
         )}
       </div>
       <p className="timer-readout__status" role="status">
-        {labels[state.timer.status]}
+        {controlFocused && ['idle', 'stopped'].includes(state.timer.status)
+          ? t('Click the timer or use Tab to return')
+          : labels[state.timer.status]}
       </p>
     </div>
   );

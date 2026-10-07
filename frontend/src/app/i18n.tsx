@@ -49,6 +49,17 @@ const russian = {
     'Сборка · Нажмите любую клавишу для остановки',
   'Stopped · Release the key': 'Остановлено · Отпустите клавишу',
   'Solve time': 'Время сборки',
+  'Solve completed': 'Сборка завершена',
+  'Result updated': 'Результат изменён',
+  'Click the timer or use Tab to return': 'Вернитесь к таймеру: клик или Tab',
+  'Last 20': 'Последние 20',
+  'About statistics': 'О статистике',
+  'Mean is the average of all completed times, including +2 and excluding DNF.':
+    'Среднее — среднее время всех успешных сборок с учётом +2, без DNF.',
+  'aoN is the average of the last N solves: ao5, ao12, ao50 and ao100 require at least 5, 12, 50 and 100 results respectively.':
+    'aoN — среднее последних N сборок: для ao5, ao12, ao50 и ao100 нужно минимум 5, 12, 50 и 100 результатов соответственно.',
+  '— means there is not enough data yet. Averages exclude the best and worst results; if a DNF remains, the average is DNF.':
+    '— означает, что данных пока недостаточно. Из среднего aoN исключаются лучшие и худшие результаты; если среди оставшихся есть DNF, среднее тоже DNF.',
   Statistics: 'Статистика',
   best: 'лучшее',
   mean: 'среднее',

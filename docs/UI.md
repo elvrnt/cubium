@@ -61,6 +61,30 @@ focus there after a pointer selection; keyboard selection retains focus and nati
 arrow/Space behavior. The workspace has tabIndex=-1 (programmatically focusable,
 without adding a Tab stop). Buttons remain reachable and operable through Tab.
 Other dialogs retain their normal opener restoration.
+The timer readout and footer replace the Space instruction with a localized
+return-to-timer hint while an interactive control is focused. Clicking the
+readout focuses its neutral section; clicks on its buttons and fields preserve
+native control behavior. No global blur or interactive Space override is used.
+
+`SolveAnnouncement` provides a separate visually hidden, atomic polite live
+region. It observes application notifications synchronously so batched stop and
+release cannot hide completion. Each new pending save ID announces its formatted
+result once, including an unsaved result; saving, retrying and key release do not
+repeat it. Running clears the announcement and frame updates remain silent.
+Changing the penalty of the result completed during this page session announces
+“Result updated” with the same domain formatter (+2 or DNF), rather than another
+completion. Restored history, older edits and notes stay silent. Language changes
+do not reannounce an earlier result. No timer/application/storage contract changes.
+
+The Statistics info button opens a compact nonmodal help region explaining mean,
+the required sample sizes for ao5/12/50/100, insufficient-data dashes, and DNF
+handling. It focuses the help for keyboard access; Close or Escape dismisses it
+and returns to the neutral timer workspace. Timer shortcuts are suspended while
+help is open, and its trigger is disabled during timing or unresolved writes.
+All help and announcements use the existing RU/EN dictionary.
+
+History is explicitly
+labelled Last 20, and the status instruction uses 14px text.
 Recent results are buttons with hover/focus and pressed selection styles.
 Selecting one opens a compact details dialog with the stored historical scramble
 as selectable text and reusable result actions. The current scramble/cube never

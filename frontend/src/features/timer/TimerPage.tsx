@@ -3,12 +3,16 @@ import type { TimerApplication } from '../../application/timer';
 import type { TimerClock } from '../../domain/timer';
 import { formatSolveTime } from '../../domain/solves';
 import { CubeVisualization } from '../cube';
-import { attachTimerKeyboard } from './keyboardController';
+import {
+  attachTimerKeyboard,
+  ignoresTimerShortcut,
+} from './keyboardController';
 import { useTimerApplication } from './useTimerApplication';
 import { TimerDisplay } from './TimerDisplay';
 import { StatisticsPanel } from './StatisticsPanel';
 import { ResultActions } from './ResultActions';
 import { Dialog } from './Dialog';
+import { SolveAnnouncement } from './SolveAnnouncement';
 import { useLanguage } from '../../app/i18n';
 import './timer.css';
 
@@ -24,6 +28,12 @@ export function TimerPage({
   const timerFocusRef = useRef<HTMLElement>(null);
   const languagePointerSelection = useRef(false);
   const [cubeOpen, setCubeOpen] = useState(false);
+  const [statisticsHelpOpen, setStatisticsHelpOpen] = useState(false);
+  const [controlFocused, setControlFocused] = useState(false);
+  const closeStatisticsHelp = () => {
+    setStatisticsHelpOpen(false);
+    timerFocusRef.current?.focus({ preventScroll: true });
+  };
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const selected = state.solves.find((solve) => solve.id === selectedId);
   useEffect(
@@ -40,9 +50,9 @@ export function TimerPage({
   const [editing, setEditing] = useState(false);
   const [actionError, setActionError] = useState<unknown>(null);
   useEffect(() => {
-    if (editing || cubeOpen || selected) return;
+    if (editing || cubeOpen || selected || statisticsHelpOpen) return;
     return attachTimerKeyboard(application, clock, setActionError);
-  }, [application, clock, editing, cubeOpen, selected]);
+  }, [application, clock, editing, cubeOpen, selected, statisticsHelpOpen]);
   const displayed = state.solves.find(
     (solve) => solve.id === state.displayedSolveId,
   );
@@ -50,7 +60,22 @@ export function TimerPage({
     state.persistence.status !== 'idle' ||
     !['idle', 'stopped'].includes(state.timer.status);
   return (
-    <div className="timer-page">
+    <div
+      className="timer-page"
+      onFocusCapture={(event) =>
+        setControlFocused(ignoresTimerShortcut(event.target))
+      }
+      onBlurCapture={(event) =>
+        setControlFocused(ignoresTimerShortcut(event.relatedTarget))
+      }
+      onKeyDown={(event) => {
+        if (event.key === 'Escape' && statisticsHelpOpen) {
+          event.preventDefault();
+          closeStatisticsHelp();
+        }
+      }}
+    >
+      <SolveAnnouncement application={application} />
       <header className="site-header">
         <a className="brand" href="/" aria-label={t('Cubium home')}>
           <span className="brand__mark" aria-hidden="true">
@@ -149,13 +174,29 @@ export function TimerPage({
               )}
             </section>
             <div className="timer-workspace">
-              <StatisticsPanel statistics={state.statistics} />
+              <StatisticsPanel
+                statistics={state.statistics}
+                helpOpen={statisticsHelpOpen}
+                disabled={busy}
+                onHelpOpen={() => setStatisticsHelpOpen(true)}
+                onHelpClose={closeStatisticsHelp}
+              />
               <section
                 className="timer-center"
                 aria-label={t('Timer')}
                 tabIndex={0}
+                onClick={(event) => {
+                  if (!ignoresTimerShortcut(event.target)) {
+                    setStatisticsHelpOpen(false);
+                    event.currentTarget.focus({ preventScroll: true });
+                  }
+                }}
               >
-                <TimerDisplay application={application} state={state} />
+                <TimerDisplay
+                  application={application}
+                  state={state}
+                  controlFocused={controlFocused}
+                />
                 {displayed && (
                   <ResultActions
                     key={displayed.id}
@@ -225,7 +266,7 @@ export function TimerPage({
             </div>
             <section className="recent-solves" aria-label={t('Recent solves')}>
               <div className="recent-solves__heading">
-                <h2>{t('Recent')}</h2>
+                <h2>{t('Last 20')}</h2>
                 <span>
                   {t('Total solves')}: {state.solves.length} ·{' '}
                   {t('newest first')}
@@ -265,7 +306,11 @@ export function TimerPage({
         )}
       </main>
       <footer className="site-footer">
-        <span>{t('Hold Space · release to start · any key to stop')}</span>
+        <span>
+          {controlFocused && ['idle', 'stopped'].includes(state.timer.status)
+            ? t('Click the timer or use Tab to return')
+            : t('Hold Space · release to start · any key to stop')}
+        </span>
         <span>{t('Local-first speedcubing')}</span>
       </footer>
       {cubeOpen && state.currentScramble && (

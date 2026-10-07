@@ -156,7 +156,13 @@ test('edits notes with spaces without timing, supports cancel, and persists afte
   await page.keyboard.press('Space');
   await note.pressSequentially('then pairs');
   await expect(note).toHaveValue('Cross then pairs');
-  await expect(page.locator('.timer-readout__status')).toContainText('Idle');
+  await expect(page.locator('.timer-readout')).toHaveAttribute(
+    'data-state',
+    'idle',
+  );
+  await expect(page.locator('.timer-readout__status')).toContainText(
+    'Click the timer',
+  );
   await expect(page.getByTestId('recent-solve')).toHaveCount(1);
   await page.getByRole('button', { name: 'Save note' }).click();
   await expect(note).not.toBeVisible();
