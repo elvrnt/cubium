@@ -4,6 +4,12 @@
 
 Cubium uses a client-server architecture with a local-first frontend.
 
+The diagram below describes the target architecture. The current MVP implements
+the browser Timer and local IndexedDB storage; FastAPI provides only `/health`
+and `/api/v1/health`. Authentication, synchronization and PostgreSQL are not
+implemented. The installed stack and verification commands are in
+[README.md](../README.md) and [DEVELOPMENT.md](DEVELOPMENT.md).
+
 The frontend is not a thin client.
 
 Most interactive cube-related functionality executes in the browser.
@@ -161,7 +167,14 @@ Examples:
 - displayed elapsed time;
 - modal state.
 
-Zustand may manage this where useful.
+The current Timer uses React state for UI drafts/dialog visibility and a plain
+TypeScript `TimerApplication` for business state. `useSyncExternalStore` binds
+application snapshots to React. Zustand is a planned option, not an installed
+dependency or a requirement to change this implementation.
+
+`displayedSolveId` and historical selection are transient. History reload never
+selects a central result: a new page starts at 0.000. Completed solves during
+that page session select themselves. See [TIMER.md](TIMER.md#react-and-browser-adapters).
 
 ### Local persistent state
 
@@ -210,12 +223,7 @@ The timer must use explicit states rather than a large collection of overlapping
 Minimum state model:
 
 ```ts
-type TimerStatus =
-  | "idle"
-  | "holding"
-  | "ready"
-  | "running"
-  | "stopped";
+type TimerStatus = "idle" | "holding" | "ready" | "running" | "stopped";
 ```
 
 Possible future state:
@@ -241,11 +249,11 @@ ready
  ▼
 running
  │
- │ Space down
+ │ any key down
  ▼
 stopped
  │
- │ Space up / result finalized
+ │ release of the stopping key
  ▼
 idle
 ```
@@ -267,6 +275,12 @@ Timer keyboard shortcuts must be disabled when the user is typing in:
 - editable controls;
 - note editor.
 
+Outside Running, buttons and links also retain native keyboard activation.
+The adapter is suspended while the cube, solve details, note/delete dialog or
+statistics help is open. Native dialogs manage background inertness; the shared
+UI focus helper distinguishes pointer tasks from keyboard tasks without global
+blur or an interactive Space override. See [UI.md](UI.md#existing-mvp-behavior).
+
 ## Time measurement
 
 At start:
@@ -284,13 +298,13 @@ elapsedMs = performance.now() - startedAt;
 Persist:
 
 ```ts
-Math.round(elapsedMs)
+Math.round(elapsedMs);
 ```
 
 Rendering may use:
 
 ```ts
-requestAnimationFrame()
+requestAnimationFrame();
 ```
 
 while running.

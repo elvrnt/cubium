@@ -27,6 +27,10 @@ The MVP must be useful even with no backend connection.
 - ao50;
 - ao100;
 - responsive layout;
+- RU/EN localization with a remembered language preference;
+- historical solve details with local date/time;
+- accessible note/delete and enlarged-cube dialogs;
+- concentration while running;
 - basic automated tests.
 
 ### Excluded
@@ -49,17 +53,17 @@ A minimal backend skeleton with `/api/v1/health` is allowed, but backend availab
 
 On application load:
 
-1. generate or restore a current 3x3 scramble;
-2. display scramble;
-3. display scrambled cube visualization;
-4. timer displays:
+1. load solve history from IndexedDB; expose Retry on failure;
+2. derive statistics from the loaded history;
+3. generate the initial 3x3 scramble, then display its notation and cube;
+4. the central timer displays:
 
 ```text
 0.000
 ```
 
-5. load solve history from IndexedDB;
-6. calculate statistics.
+Historical results never become the central displayed result automatically.
+Current scramble is generated anew on reload; it is not a persisted field.
 
 ### Starting a solve
 
@@ -88,7 +92,7 @@ ready -> running
 Record:
 
 ```ts
-performance.now()
+performance.now();
 ```
 
 as the start timestamp.
@@ -111,6 +115,10 @@ During the solve:
 - use `requestAnimationFrame` for rendering;
 - use `performance.now()` as the authoritative time source.
 
+Only the centered digits remain visible while Running. The surrounding interface
+remains mounted but hidden and inert. Holding and Ready keep it visible. Stop
+keydown restores it immediately, independently of release and saving; see [UI.md](UI.md).
+
 ### Stopping
 
 When the timer is running, pressing any keyboard key stops it.
@@ -129,7 +137,7 @@ Generate the next scramble.
 
 ### Result actions
 
-For the last solve show:
+For the displayed result completed during the current page session show:
 
 ```text
 Note
@@ -155,7 +163,7 @@ Effective displayed result:
 12.521+
 ```
 
-If clicked again, implementation may toggle the penalty off.
+Clicking an already active +2 or DNF action toggles that penalty to NONE.
 
 A solve cannot simultaneously have `PLUS_TWO` and `DNF`.
 
@@ -173,9 +181,13 @@ DNF must participate correctly in average calculations.
 
 ### Delete
 
-Require a lightweight confirmation mechanism if accidental deletion is likely.
+Use a compact native confirmation dialog identifying the selected solve, with
+Delete/Cancel, Escape cancellation and initial focus on Cancel.
 
-Deleting a solve recalculates statistics immediately.
+The history and statistics change after durable deletion succeeds. Deleting the
+currently displayed result resets the timer to 0.000 and hides its actions;
+deleting an older solve leaves the current result unchanged. A failed deletion
+retains the record and exposes Retry.
 
 ### Note
 
@@ -183,6 +195,11 @@ Allow a free-text note of at most 300 UTF-16 code units for a solve, enforced
 by the domain/application contract as well as the editor (see [DOMAIN.md](DOMAIN.md)).
 
 The timer must not react to Space while the note field is active.
+
+Use a compact native note dialog with initial textarea focus, current note,
+Save/Cancel, Escape and a length counter. Dialog focus management follows
+[UI.md](UI.md#existing-mvp-behavior); pointer task completion returns to the timer
+after the outermost dialog closes, while keyboard tasks restore their opener.
 
 ## Solve model
 
@@ -214,8 +231,7 @@ function getEffectiveTimeMs(solve: Solve): number | null {
     return null;
   }
 
-  return solve.rawTimeMs +
-    (solve.penalty === "PLUS_TWO" ? 2000 : 0);
+  return solve.rawTimeMs + (solve.penalty === "PLUS_TWO" ? 2000 : 0);
 }
 ```
 
@@ -261,7 +277,7 @@ Lowest non-DNF effective solve time.
 
 ### Mean
 
-Arithmetic mean of all non-DNF solves in the current session.
+Arithmetic mean of all stored non-DNF solves. Separate sessions are not implemented.
 
 DNF solves are excluded from simple mean for the initial MVP unless a different metric is explicitly implemented and documented.
 

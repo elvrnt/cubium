@@ -188,7 +188,7 @@ The ordinary work surface is flat. Fine rules, stronger control strokes and the 
 
 ## Shapes
 
-Controls and inline editors have gently eased corners using the control radius. Dialogs use the larger dialog radius. The standard interactive stroke is one pixel; active navigation has a cobalt underline (2px). Main buttons and language selection provide a minimum target height (44px), and buttons also provide a minimum width (44px).
+Controls and textarea fields have gently eased corners using the control radius. Dialogs use the larger dialog radius. The standard interactive stroke is one pixel; active navigation has a cobalt underline (2px). Main buttons and language selection provide a minimum target height (44px), and buttons also provide a minimum width (44px).
 
 The Cubium mark, statistics help and cube enlargement affordance use inline stroke SVG, with `currentColor` and a light stroke (1.5). These functional symbols belong to the existing sparse icon vocabulary.
 
@@ -200,7 +200,7 @@ Quiet outlined actions use the control stroke, transparent fill and compact padd
 
 ### Inputs / Fields
 
-The language selector uses the page surface, stronger control stroke and control radius. The note field uses raised paper, the same stroke and radius, and compact padding (10px). It resizes vertically and remains inside a compact bordered editor (maximum width 400px, padding 16px). Counts and validation remain written, legible copy; notes preserve line breaks.
+The language selector uses the page surface, stronger control stroke and control radius. The note field uses raised paper, the same stroke and radius, and compact padding (10px). It resizes vertically inside a compact native dialog. Counts and validation remain written, legible copy; notes preserve line breaks.
 
 ### Navigation
 
@@ -213,6 +213,11 @@ The statistics strip has a fine top rule, six evenly distributed values on deskt
 ### Dialogs
 
 Native dialogs use raised paper, larger eased corners and the sole modal shadow. They fit within the viewport (`min(760px, calc(100vw - 32px))`), scroll within its height and keep a visible Close action. Their focus and dismissal behavior remain the implemented native-modal behavior, as documented in `docs/UI.md`.
+
+Note and delete dialogs use the compact width `min(460px, calc(100vw - 32px))`.
+They identify the solve and its localized creation time. Result-dialog pointer
+tasks return to the neutral timer area; keyboard tasks return to their opener. A nested editor
+returns to its parent details dialog until that dialog is dismissed.
 
 ### Timer / Concentration
 

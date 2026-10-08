@@ -10,6 +10,12 @@ OWN-WORLD: Warm white #F5F3EC, ink #18232E, cobalt #244AC7, dark green readiness
 
 STORY: Read the scramble, hold Space, release to solve, stop with any key, then review the result and continue.
 
+RESULT LIFECYCLE: Reload restores history/statistics and generates a fresh scramble,
+while the central readout starts at 0.000. Historical details show local RU/EN
+creation date/time. Note and delete tasks use compact native dialogs. Pointer
+tasks return to neutral timer focus after the outer dialog closes; keyboard tasks
+restore their opener. Nested editors return to the open parent details view.
+
 FIRST VIEWPORT: Compact header, scramble above viewport-centered digits, cube to the right, result actions underneath, then six statistics, latest 20 solves and keyboard guidance. Compact screens flow vertically. Running hides everything except the same digits; stopping restores the work surface immediately.
 
 FORM: Light competition protocol, grounded candidate 5, seed 3c3779ad, explicitly selected by the user. Signature interaction: the working surface disappears on start without moving or resizing the desktop timer. No animated transition.

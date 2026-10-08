@@ -9,7 +9,9 @@ application coordinator connects timer results, scramble ownership, Solve
 creation, persistence, editing and derived statistics. Its deterministic tests
 inject fake repositories, generators and clocks; they do not retest Dexie/cubing.
 The React screen binds the coordinator and provides keyboard timing, result
-editing, statistics, history and error retries. Authentication and synchronization
+editing, statistics, history and error retries. It uses Light Protocol appearance,
+locally bundled Sports Stopwatch fonts and concentration while Running.
+Authentication and synchronization
 remain future work. The separate dev preview remains dedicated to scrambles.
 Frontend and backend can be run and tested independently.
 
@@ -37,9 +39,10 @@ npm run test:e2e
 
 Vitest and React Testing Library run component/unit tests in jsdom. Test files
 are colocated as `src/**/*.test.ts` or `src/**/*.test.tsx`.
-Playwright tests live in `e2e/`. The browser smoke test serves the production
+Playwright tests live in `e2e/`. The browser suite serves the production
 build with Vite preview on port 4173, so build before running it. No backend
-is started for this test. On Linux CI, install Chromium with
+is started for these tests. Locally the suite may reuse a server already on port
+4173; stop an outdated preview before testing a new build. On Linux CI, install Chromium with
 `npx playwright install --with-deps chromium`.
 
 Use `npm run test:watch` during development and `npm run format` to format files.
@@ -51,16 +54,25 @@ Open `/` for the production Timer screen. Hold Space until Ready, release to
 start, then press/release any keyboard key to stop. Recent results and statistics update after
 local save. Note/+2/DNF/Delete target the result identified by the action caption;
 select any recent result to edit its historical record. Reload to verify history,
-penalties and notes persist. Space in editors and on focused buttons keeps native
-behavior; click the timer area to return to timing.
+penalties and notes persist while the central timer resets to 0.000 and its
+actions disappear. Scramble is generated anew. Notes and deletion use compact
+native dialogs; selected details show local date/time from the original `createdAt`.
+Space in editors and on explicitly focused buttons keeps native behavior.
+After a pointer-opened outer result dialog closes, focus returns to the neutral timer
+workspace; keyboard-opened result dialogs restore their opener. The enlarged
+cube always returns to the timer. Nested editors return
+to details until that view closes. See [UI.md](UI.md#existing-mvp-behavior).
 
 Component tests cover Strict Mode initialization/subscription cleanup, controller
 event translation, repeats, early hold callbacks, blur cancellation, protected
-editing targets, animation-frame cleanup, formatting, actions and retries.
+editing targets, animation-frame cleanup, formatting, actions and retries, plus
+reload without a displayed historical result, dialog editing and RU/EN dates.
 Playwright runs the real production app with isolated browser storage: complete
 solves, reload, +2, DNF, notes, deletion, repeats, no-scroll input and viewport
 checks. It waits for visible Ready rather than depending on an exact sleep, and
-does not assert exact wall-clock solve durations. Layout screenshots are written
+does not assert exact real wall-clock solve durations. The long-readout regression
+advances an actual solve with Playwright's fake browser clock, preserving the
+production performance.now() path without real waiting. Layout screenshots are written
 to ignored `test-results/` output. The standalone scramble preview smoke test is
 retained. Two workers limit concurrent cubing worker startup.
 
@@ -69,10 +81,31 @@ preference reload, native cube dialog/Escape/focus return, historical scramble
 isolation, a persisted 300-character note, penalty edits and deletion of older
 versus displayed results. Unit tests cover ao50 trimming/DNFs/latest-window/+2,
 note lengths 299/300/301, and validation before repository writes. jsdom component
-tests stub native dialog opening; Playwright verifies real browser modal behavior.
-Manually inspect both languages at desktop and laptop widths, enlarge the cube,
-open a historical editor and check the console. Deleting displayed B after A
-must leave A in history while the central timer becomes 0.000.
+tests stub native dialog opening; Playwright verifies real browser modal behavior,
+Tab wrapping, note Save/Cancel/Escape, confirmation cancellation, history pointer
+close followed immediately by Space, and keyboard opener restoration/activation.
+Console/page errors are monitored in browser regressions. Test coverage is not a
+claim of a complete manual run.
+
+Manual checklist:
+
+- Complete two solves, reload, and verify unchanged history/statistics with a
+  central 0.000, no result actions and a current scramble/cube.
+- Complete another solve. Open Note, verify its draft/counter and focus, insert
+  spaces, then exercise Save, Cancel and Escape. Space must work for timing
+  after closing the outer dialog; editing must never start the timer.
+- Open Delete and exercise Cancel/Escape, then confirm deletion. Deleting
+  displayed B after A leaves A in history and resets the central timer to 0.000;
+  deleting A instead preserves B.
+- Open an older result with the pointer, check its original scramble and date,
+  close details and immediately hold Space. The result must not reopen.
+- Repeat with Tab and Enter/Space. Close should restore the keyboard opener;
+  Tab navigation and native button activation remain available.
+- Check RU/EN creation dates in the browser's local timezone, enlarge/close the
+  cube, switch language by pointer and keyboard, and inspect the console.
+- Check holding/ready versus Running concentration at 1440×900, 1280×720,
+  1024×768, 390×844 and 320×800, plus enlarged text. Automated zoom cases use
+  equivalent CSS viewport sizes; actual browser zoom needs a separate manual check.
 
 ### Scramble development preview
 

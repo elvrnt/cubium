@@ -125,7 +125,7 @@
       "name": "Delete Confirmation",
       "kind": "button",
       "refersTo": "button-danger",
-      "description": "Destructive confirmation in the compact inline editor.",
+      "description": "Destructive action in the compact native confirmation dialog.",
       "html": "<button class=\"ds-danger\" type=\"button\">Confirm delete</button>",
       "css": ".ds-danger{min-height:44px;min-width:44px;font-family:var(--font-ui, 'Golos Text', system-ui, sans-serif);font-size:0.9375rem;border:1px solid var(--control-border, #7d8791);border-radius:4px;background:transparent;color:var(--ink, #18232e);padding:8px 14px;cursor:pointer;color:var(--danger, #a02d34)}.ds-danger:hover:not(:disabled){background:var(--accent-soft, #e5eafa);border-color:var(--accent, #244ac7)}.ds-danger:focus-visible{outline:2px solid var(--accent, #244ac7);outline-offset:4px}.ds-danger:disabled{opacity:.5;cursor:not-allowed}"
     },
@@ -133,9 +133,9 @@
       "name": "Note Field",
       "kind": "input",
       "refersTo": "note-field",
-      "description": "Raised-paper note field and its existing character counter.",
+      "description": "Raised-paper note field and character counter inside the compact native dialog.",
       "html": "<div class=\"ds-note\"><label for=\"ds-solve-note\">Note for solve</label><textarea id=\"ds-solve-note\" rows=\"3\" maxlength=\"300\" aria-describedby=\"ds-note-count\"></textarea><p id=\"ds-note-count\">Characters used: 0 / 300</p></div>",
-      "css": ".ds-note{max-width:400px;padding:16px;border:1px solid var(--line, #cbd0d1);border-radius:4px;font:400 0.9375rem/1.5 var(--font-ui, 'Golos Text', system-ui, sans-serif);color:var(--ink, #18232e)}.ds-note label{display:block;margin-bottom:8px}.ds-note textarea{width:100%;box-sizing:border-box;resize:vertical;background:var(--surface-raised, #fffdf8);color:var(--ink, #18232e);border:1px solid var(--control-border, #7d8791);border-radius:4px;padding:10px;font:inherit;line-height:1.5;caret-color:var(--accent, #244ac7)}.ds-note textarea:focus-visible{outline:2px solid var(--accent, #244ac7);outline-offset:4px}.ds-note p{font-size:0.8125rem;color:var(--muted, #596470)}"
+      "css": ".ds-note{max-width:none;padding:0;border:0;margin:16px 0 0;font:400 0.9375rem/1.5 var(--font-ui, 'Golos Text', system-ui, sans-serif);color:var(--ink, #18232e)}.ds-note label{display:block;margin-bottom:8px}.ds-note textarea{width:100%;box-sizing:border-box;resize:vertical;background:var(--surface-raised, #fffdf8);color:var(--ink, #18232e);border:1px solid var(--control-border, #7d8791);border-radius:4px;padding:10px;font:inherit;line-height:1.5;caret-color:var(--accent, #244ac7)}.ds-note textarea:focus-visible{outline:2px solid var(--accent, #244ac7);outline-offset:4px}.ds-note p{font-size:0.8125rem;color:var(--muted, #596470)}"
     },
     {
       "name": "Language Selector",
@@ -179,7 +179,7 @@
       "name": "Solve Details Dialog",
       "kind": "custom",
       "refersTo": "dialog",
-      "description": "Development-only static dialog shell showing existing modal materials; application code owns native focus trapping and dismissal.",
+      "description": "Development-only static details shell; the app adds the selected result and localized local creation date/time. Native dialog code owns focus trapping and dismissal; note/delete variants use a 460px compact maximum width.",
       "html": "<section class=\"ds-dialog\" role=\"dialog\" aria-labelledby=\"ds-dialog-title\"><header class=\"ds-dialog-header\"><h2 id=\"ds-dialog-title\">Solve details</h2><button class=\"ds-dialog-close\" type=\"button\">Close</button></header><p>Penalty: None</p><h3>Historical scramble</h3><p class=\"ds-dialog-scramble\">R U2 F′ L2 D R2</p></section>",
       "css": ".ds-dialog{width:min(760px,calc(100vw - 32px));max-height:calc(100svh - 32px);overflow:auto;padding:24px;border:0;border-radius:12px;background:var(--surface-raised, #fffdf8);color:var(--ink, #18232e);box-shadow:0 24px 90px #18232e40;font-family:var(--font-ui, 'Golos Text', system-ui, sans-serif);box-sizing:border-box}.ds-dialog-header{display:flex;align-items:center;justify-content:space-between;gap:20px}.ds-dialog h2{font-size:1.25rem;margin:0}.ds-dialog h3{font-size:0.9375rem;color:var(--muted, #596470);margin-top:28px}.ds-dialog-scramble{font-family:var(--font-notation, 'IBM Plex Mono', ui-monospace, Consolas, monospace);font-weight:400;font-variant-ligatures:none;font-size:18px;line-height:1.65;letter-spacing:normal}.ds-dialog-close{min-height:44px;min-width:44px;font-family:var(--font-ui, 'Golos Text', system-ui, sans-serif);font-size:0.9375rem;border:1px solid var(--control-border, #7d8791);border-radius:4px;background:transparent;color:var(--ink, #18232e);padding:8px 14px;cursor:pointer;}.ds-dialog-close:hover:not(:disabled){background:var(--accent-soft, #e5eafa);border-color:var(--accent, #244ac7)}.ds-dialog-close:focus-visible{outline:2px solid var(--accent, #244ac7);outline-offset:4px}.ds-dialog-close:disabled{opacity:.5;cursor:not-allowed}"
     }

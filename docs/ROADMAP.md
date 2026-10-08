@@ -4,6 +4,15 @@ This file describes direction, not current implementation requirements.
 
 Do not implement later phases unless explicitly requested.
 
+## Current implementation
+
+Phase 0 and the core Phase 1 Timer MVP are implemented. The Timer also includes
+historical solve details, RU/EN localization, compact note/delete dialogs,
+local creation date/time and Running concentration. Current behavior is documented
+in [MVP.md](MVP.md), [UI.md](UI.md) and [TIMER.md](TIMER.md).
+Sessions and Phases 2 onward remain future work; items already shipped are not
+requirements to reimplement.
+
 # Phase 0 — Repository foundation
 
 Goal:
@@ -41,6 +50,7 @@ Deliverables:
 - mean;
 - ao5;
 - ao12;
+- ao50;
 - ao100;
 - unit tests;
 - E2E timer test.
@@ -84,7 +94,7 @@ Possible functionality:
 - configurable hold duration;
 - keyboard preferences;
 - more detailed statistics;
-- solve detail view;
+- expanded solve analysis beyond the existing historical details dialog;
 - session export/import;
 - PWA support.
 

@@ -20,15 +20,15 @@ Every event contains a monotonic `now` timestamp. Event types are
 `STOP_KEY_UP`, and `CANCEL_HOLD`. The threshold event also carries the captured `holdStartedAt`
 so a callback from a previous hold cannot arm a different hold.
 
-| Current state | Event and condition | Next state |
-| --- | --- | --- |
-| idle | START_KEY_DOWN | holding, timestamp captured |
-| holding | HOLD_THRESHOLD_REACHED for this hold, elapsed >= threshold | ready |
-| holding | START_KEY_UP | idle |
-| ready | START_KEY_UP | running, release timestamp captured |
-| running | STOP_KEY_DOWN | stopped, duration and completion effect returned |
-| stopped | STOP_KEY_UP | idle |
-| holding/ready | CANCEL_HOLD with a valid timestamp | idle, no solve starts |
+| Current state | Event and condition                                        | Next state                                       |
+| ------------- | ---------------------------------------------------------- | ------------------------------------------------ |
+| idle          | START_KEY_DOWN                                             | holding, timestamp captured                      |
+| holding       | HOLD_THRESHOLD_REACHED for this hold, elapsed >= threshold | ready                                            |
+| holding       | START_KEY_UP                                               | idle                                             |
+| ready         | START_KEY_UP                                               | running, release timestamp captured              |
+| running       | STOP_KEY_DOWN                                              | stopped, duration and completion effect returned |
+| stopped       | STOP_KEY_UP                                                | idle                                             |
+| holding/ready | CANCEL_HOLD with a valid timestamp                         | idle, no solve starts                            |
 
 All other events return the existing state and no effect. Duplicate keydowns,
 stops, releases, and stale callbacks therefore cannot reset the origin or emit
@@ -122,20 +122,20 @@ connection lifetime; the coordinator does not close shared adapters.
 function. The listener reads `getState()`; subscription itself does not notify.
 Snapshots and nested data are frozen (error payloads remain opaque). Listener
 exceptions are logged and isolated so they cannot interrupt persistence. Stable
-`getState` and `subscribe` functions support a later `useSyncExternalStore` bridge.
+`getState` and `subscribe` functions support the React `useSyncExternalStore` bridge.
 
 ### Public operations
 
-| Method | Behavior |
-| --- | --- |
-| `initialize()` | Load history, derive statistics, then generate the initial scramble. Call again after load failure to retry; calls while loading or after history loaded are no-ops. |
-| `dispatchTimerEvent(event)` | Forward timestamped events to the domain synchronously. A stop's returned promise covers persistence and next generation. No external effect-handling API exists. |
-| `getElapsedTimeMs()` | Derive elapsed time using the injected monotonic clock, without changing state. |
-| `retryScramble()` | Retry failed generation; otherwise no-op. |
-| `retryPersistence()` | Retry the retained failed mutation; otherwise no-op. |
-| `setPenalty(id, penalty)` | Apply `setSolvePenalty`, persist a new snapshot, update history/statistics. |
-| `updateNote(id, note)` | Validate through `setSolveNote`, then persist the exact string or null; reject more than `MAX_SOLVE_NOTE_LENGTH` before writing. |
-| `deleteSolve(id)` | Persist deletion before removing the record and recalculating statistics. Unknown IDs are no-ops. |
+| Method                      | Behavior                                                                                                                                                             |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `initialize()`              | Load history, derive statistics, then generate the initial scramble. Call again after load failure to retry; calls while loading or after history loaded are no-ops. |
+| `dispatchTimerEvent(event)` | Forward timestamped events to the domain synchronously. A stop's returned promise covers persistence and next generation. No external effect-handling API exists.    |
+| `getElapsedTimeMs()`        | Derive elapsed time using the injected monotonic clock, without changing state.                                                                                      |
+| `retryScramble()`           | Retry failed generation; otherwise no-op.                                                                                                                            |
+| `retryPersistence()`        | Retry the retained failed mutation; otherwise no-op.                                                                                                                 |
+| `setPenalty(id, penalty)`   | Apply `setSolvePenalty`, persist a new snapshot, update history/statistics.                                                                                          |
+| `updateNote(id, note)`      | Validate through `setSolveNote`, then persist the exact string or null; reject more than `MAX_SOLVE_NOTE_LENGTH` before writing.                                     |
+| `deleteSolve(id)`           | Persist deletion before removing the record and recalculating statistics. Unknown IDs are no-ops.                                                                    |
 
 Missing IDs for updates reject with the existing `SolveNotFoundError`. Editing
 before history loads, during holding/ready/running, or during pending/failed
@@ -193,7 +193,7 @@ START_KEY_UP/STOP_KEY_UP. Repeats and duplicate downs are ignored. Handled keys
 prevent default browser actions. Outside running, text inputs,
 textarea, select, contenteditable, buttons, links and marked editor regions retain
 native keyboard behavior. The entire timer shortcut adapter is suspended while
-the note editor or delete confirmation is open.
+the cube, solve details, note/delete dialog or statistics help is open.
 
 The scheduler captures holdStartedAt and uses DEFAULT_HOLD_THRESHOLD_MS; it
 cancels when holding ends. Early callbacks are rescheduled only if the domain
@@ -214,7 +214,8 @@ back to older history. Failed deletion retains it until a successful retry.
 The action caption and buttons use the same displayed ID and disappear when it
 is cleared; older records remain accessible through the recent-history buttons.
 Editing/deleting a different historical solve leaves it unchanged. On a fresh
-page load the latest durable solve is selected initially (or zero with no history);
+page load the displayed ID remains null and the central timer shows 0.000,
+while durable history and derived statistics are restored normally;
 the display identity and historical editor selection are not persisted. Timer
 domain states, precise timestamps and transition semantics remain unchanged.
 

@@ -74,19 +74,23 @@ state, clock or persistence change.
 `TimerPage` composes `TimerDisplay`, `StatisticsPanel`, `CubeVisualization` and
 `ResultActions`. Statistics use coordinator values and domain formatting: numeric
 time, DNF, or an em dash. Scramble/cube input comes only from currentScramble.
-The idle readout retains the independently tracked displayed result. Deleting it
+Fresh opening/reload restores history and statistics but starts the central timer
+at 0.000, without selecting a historical result. A completion during this page
+session selects its own result. The idle readout retains that independently tracked result. Deleting it
 shows 0.000 even when older history remains, and hides the result caption and
 action buttons. There is no first-solve hint under the timer. Compact actions identify their target
 by its formatted result. +2 and DNF buttons toggle to NONE when
 already selected, or select that single penalty otherwise.
 
-The inline note editor loads the current note, preserves text exactly, supports
-save/cancel/Escape, focuses its textarea and returns focus to Note on close.
-Delete uses an inline confirmation with initial focus on Cancel. Actions disable
-while timing or persistence is unresolved. Notes use the domain's 300-character
+The compact native note dialog loads the current note, preserves text exactly,
+supports save/cancel/Escape and initially focuses its textarea.
+Delete uses a compact confirmation dialog identifying the selected result and its
+creation time, with initial focus on Cancel and a red destructive action. Actions disable
+while timing or persistence is unresolved. Notes use the domain's 300 UTF-16 code unit
 limit, a used/maximum counter and accessible validation without trimming text.
-Space on a focused button remains
-native activation; click the timer area or move focus there to time again.
+Native modal dialogs trap focus and make the background inert. Space inside the
+textarea never controls timing. Failed writes retain the draft and expose Retry
+inside the modal. Space on an explicitly focused button retains native activation.
 
 Startup waits for history before showing statistics. History, scramble and
 persistence failures have separate Retry controls through the coordinator.
@@ -105,7 +109,12 @@ starts a hold instead of reopening the cube. The language selector also returns
 focus there after a pointer selection; keyboard selection retains focus and native
 arrow/Space behavior. The workspace has tabIndex=-1 (programmatically focusable,
 without adding a Tab stop). Buttons remain reachable and operable through Tab.
-Other dialogs retain their normal opener restoration.
+History, note and delete dialogs use the shared interaction-focus helper:
+pointer opening returns focus to the neutral timer workspace on close; keyboard
+opening restores the opener if it still exists, otherwise the timer. Nested
+note/delete dialogs return pointer focus to their parent details dialog until
+that view is closed. Escape dismisses only the topmost dialog. Deleted openers
+cannot retain focus. Language pointer selection uses the same neutral helper.
 The timer readout and footer replace the Space instruction with a localized
 return-to-timer hint while an interactive control is focused. Clicking the
 readout focuses its neutral section; clicks on its buttons and fields preserve
@@ -133,10 +142,14 @@ The page has no minimum body width, so 320px screens can reflow without horizont
 scrolling. History is explicitly labelled Last 20; state instructions use 15px text.
 Recent results are buttons with hover/focus and pressed selection styles.
 Selecting one opens a compact details dialog with the stored historical scramble
-as selectable text and reusable result actions. The current scramble/cube never
+as selectable text and reusable result actions. Details and note/delete dialogs
+show `createdAt` as semantic `time` with the original ISO value; Intl.DateTimeFormat
+uses ru-RU/en-US short date and time in the user's local timezone. Formatted dates
+are presentation only. The current scramble/cube never
 changes because of selection. Successful deletion closes the selected editor;
 failed writes remain retryable inside it. Native dialogs trap focus and make the
-background inert; timer shortcuts are suspended while either dialog is open.
+background inert; Tab/Shift+Tab explicitly wrap between the first and last enabled
+control in the topmost dialog. Timer shortcuts are suspended while any dialog is open.
 
 Desktop concept:
 
@@ -270,18 +283,14 @@ Buttons should remain visually secondary to timer.
 
 ## Note editor
 
-Can be:
-
-- small inline editor;
-- popover;
-- compact dialog.
+Uses a compact native dialog, without a modal library.
 
 Do not introduce a large complex modal.
 
 While editing:
 
 - timer keyboard shortcuts are disabled;
-- Escape may close the editor;
+- Escape closes the editor;
 - changes are persisted.
 
 ## Navigation

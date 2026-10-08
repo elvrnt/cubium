@@ -28,13 +28,13 @@ and retains failed mutations in memory for explicit retry.
 ```text
 Solve
 
-id              UUID
-event           string
+id              string (client-generated UUID in production)
+event           "333"
 scramble        string
-raw_time_ms     integer
-penalty         enum
-note            nullable string
-created_at      timestamp
+rawTimeMs       non-negative integer milliseconds
+penalty         NONE | PLUS_TWO | DNF
+note            string | null
+createdAt       ISO timestamp with timezone (UTC for new records)
 ```
 
 Penalty:
@@ -51,13 +51,16 @@ The database is named `CubeTrainerDB`. Its initial Dexie version is **1**, with
 one store and the schema declaration:
 
 ```ts
-database.version(1).stores({ solves: 'id, createdAt, event' });
+database.version(1).stores({ solves: "id, createdAt, event" });
 ```
 
 Cubium deliberately keeps `CubeTrainerDB` as an internal compatibility identifier.
 The product rename leaves the database, version and records unchanged; no migration
 or deletion is performed. Language preferences use localStorage; selected history
 and displayed-result identity are transient and do not add persistent fields.
+On reload the displayed-result identity starts null even when history exists.
+`createdAt` is formatted as local date/time for RU/EN only in the UI; formatted
+dates are not stored. Current scramble is also transient and generated on startup.
 New note edits are validated in the application/domain contract against
 `MAX_SOLVE_NOTE_LENGTH` (300 UTF-16 code units; see [DOMAIN.md](DOMAIN.md)). Existing
 records are not rewritten or truncated when loaded.
@@ -81,15 +84,15 @@ no database side effects. Consumers use `SolveRepository`, which exposes no
 Dexie types or tables. The internal schema definition is in `database.ts`, where
 future Dexie versions can be added when required.
 
-| Method | Contract |
-| --- | --- |
-| `getAll()` | Returns `Promise<Solve[]>`, oldest to newest. |
-| `getById(id)` | Returns `Promise<Solve \| undefined>`. |
-| `save(solve)` | Inserts the complete source record; duplicate IDs reject and do not overwrite. |
+| Method          | Contract                                                                                                                        |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `getAll()`      | Returns `Promise<Solve[]>`, oldest to newest.                                                                                   |
+| `getById(id)`   | Returns `Promise<Solve \| undefined>`.                                                                                          |
+| `save(solve)`   | Inserts the complete source record; duplicate IDs reject and do not overwrite.                                                  |
 | `update(solve)` | Writes all supplied source fields to an existing record atomically. Unknown IDs reject with `SolveNotFoundError`, never insert. |
-| `delete(id)` | Deletes by ID; unknown IDs are a successful no-op. |
-| `clear()` | Removes all solves, keeping the store and connection usable. No UI action is provided. |
-| `close()` | Releases the connection without deleting data. Later operations on this instance reject; create another repository to reopen. |
+| `delete(id)`    | Deletes by ID; unknown IDs are a successful no-op.                                                                              |
+| `clear()`       | Removes all solves, keeping the store and connection usable. No UI action is provided.                                          |
+| `close()`       | Releases the connection without deleting data. Later operations on this instance reject; create another repository to reopen.   |
 
 All methods except `close()` are asynchronous; write methods resolve with `void`.
 IndexedDB/Dexie failures propagate as rejected promises without retries or

@@ -10,6 +10,12 @@ The project is currently focused on the MVP.
 
 The MVP consists primarily of a high-quality 3x3 timer.
 
+The Timer MVP is implemented: local history and statistics, penalties, notes,
+deletion, historical details, RU/EN localization, cube enlargement and the
+Light Protocol interface with Sports Stopwatch typography and running concentration.
+The backend currently exposes liveness endpoints only. Sessions, accounts,
+synchronization and the other training tools remain future work.
+
 Future functionality is documented in `docs/ROADMAP.md`, but must not be implemented unless explicitly requested.
 
 ## Core product principles
@@ -25,14 +31,11 @@ Future functionality is documented in `docs/ROADMAP.md`, but must not be impleme
 
 ## Tech stack
 
-### Frontend
+### Current frontend
 
 - React
 - TypeScript
 - Vite
-- React Router
-- Zustand
-- TanStack Query
 - IndexedDB
 - Dexie
 - cubing.js
@@ -40,21 +43,21 @@ Future functionality is documented in `docs/ROADMAP.md`, but must not be impleme
 - React Testing Library
 - Playwright
 
-### Backend
+### Current backend
 
 - Python
 - FastAPI
-- SQLAlchemy
-- Alembic
-- PostgreSQL
 - Pydantic
 - Pytest
 
-### Infrastructure
+### Current infrastructure
 
-- Docker
-- Docker Compose
 - GitHub Actions
+
+React Router, Zustand and TanStack Query are planned technologies, not installed
+MVP dependencies. The current timer uses a plain TypeScript application coordinator
+and React subscriptions. SQLAlchemy, Alembic, PostgreSQL and Docker support are
+also planned and are not required to run the current project.
 
 Do not introduce additional major frameworks unless there is a clear technical reason.
 
@@ -84,7 +87,7 @@ The browser is responsible for:
 - managing timer interaction;
 - future BLD calculations.
 
-The backend is responsible for:
+The future backend will be responsible for:
 
 - authentication;
 - user accounts;
@@ -132,7 +135,7 @@ Use `cubing.js`.
 For 3x3 scramble generation use the official library API based on:
 
 ```ts
-randomScrambleForEvent("333")
+randomScrambleForEvent("333");
 ```
 
 Do not implement scramble generation manually unless there is a strong technical reason.
@@ -144,7 +147,7 @@ Do not measure elapsed time by incrementing a counter with `setInterval`.
 The authoritative time source must use:
 
 ```ts
-performance.now()
+performance.now();
 ```
 
 `requestAnimationFrame` may be used to refresh the displayed value, but it must not be the source of truth for elapsed time.
@@ -170,8 +173,14 @@ Formatting belongs to the presentation layer.
 Frontend and backend must be independently runnable during development.
 
 The default page is a working 3×3 Timer MVP: hold Space for 300 ms, release to
-start, and press any keyboard key to stop. Select any recent solve to inspect its original
-scramble and edit +2/DNF, a note (up to 300 characters), or delete it. Deleting
+start, and press any keyboard key to stop. While running, only the timer digits
+remain visible; stop keydown immediately restores the interface. Reload restores
+history and statistics while the central timer starts at `0.000`.
+Select any recent solve to inspect its original scramble and local creation date/time,
+edit +2/DNF, add a note (up to 300 UTF-16 code units), or delete it.
+Notes and deletion use compact accessible dialogs. For result dialogs, closing
+the outermost pointer-opened view returns focus to the timer; keyboard tasks
+restore the opener. The enlarged cube always returns focus to the timer. Deleting
 the displayed result resets the readout to zero without selecting an older time.
 Click the cube to enlarge it. Russian is the default language; the RU/EN selector
 remembers its preference locally. Statistics include ao50 and update locally.
@@ -230,7 +239,9 @@ Particularly important:
 - IndexedDB repository behavior;
 - timer keyboard behavior.
 
-The MVP should also have at least one Playwright end-to-end flow covering a complete solve.
+Playwright covers complete solves, reload, penalties, note/delete dialogs,
+pointer and keyboard focus, RU/EN dates, concentration and responsive layout.
+See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for checks and manual scenarios.
 
 ## Code quality
 

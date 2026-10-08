@@ -141,7 +141,8 @@ After a solve, show compact actions:
 - DNF;
 - delete.
 
-Changing +2 or DNF must immediately update all displayed statistics.
+After a +2 or DNF change is saved locally, all displayed statistics update.
+Failed writes remain available for explicit retry.
 
 ### Recent solves
 
@@ -150,9 +151,13 @@ Display recent solve results below the timer.
 The newest solve should be easy to identify.
 
 Every recent result is selectable. Its details expose the exact historical
-scramble, penalty, note and deletion controls without changing the current
-scramble. Notes accept up to 300 characters. Deleting the displayed completed
+scramble, localized creation date/time, penalty, note and deletion controls without
+changing the current scramble. Notes accept up to 300 UTF-16 code units in a
+compact dialog; deletion requires a confirmation dialog. Deleting the displayed completed
 result resets the timer to zero; editing older history leaves that result alone.
+
+Reload restores history and statistics but starts the central timer at 0.000.
+Only a new completion during the page session selects the central result.
 
 The cube opens in an enlarged dialog. The MVP supports Russian (default) and
 English with a locally remembered language choice; see [UI.md](UI.md).
