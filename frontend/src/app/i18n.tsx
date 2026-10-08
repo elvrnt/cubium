@@ -84,6 +84,7 @@ const russian = {
   '3×3 cube after scramble': 'Куб 3×3 после скрамбла',
   Close: 'Закрыть',
   'Solve details': 'Подробности сборки',
+  'Created at': 'Дата и время',
   'Historical scramble': 'Скрамбл выбранной сборки',
   Penalty: 'Штраф',
   None: 'Нет',

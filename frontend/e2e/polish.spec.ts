@@ -167,7 +167,7 @@ test('historical edit stores 300 characters and penalty; old deletion preserves 
   await dialog.getByRole('button', { name: 'Confirm delete' }).click();
   await expect(dialog).not.toBeVisible();
   await expect(page.getByTestId('recent-solve')).toHaveCount(1);
-  await expect(page.getByRole('timer')).toHaveText(result);
+  await expect(page.getByRole('timer')).toHaveText('0.000');
   await expect(page.getByTestId('scramble')).toHaveText(nextScramble);
   await expect(
     page.locator('.recent-solves button[aria-pressed="true"]'),

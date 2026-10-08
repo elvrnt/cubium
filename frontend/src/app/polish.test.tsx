@@ -11,6 +11,7 @@ import { App } from './App';
 import { LANGUAGE_STORAGE_KEY } from './i18n';
 import { timerApplicationFixture } from '../test/timerApplicationFixture';
 import { makeSolve } from '../test/solveFixtures';
+import { completeTimerSolve } from '../test/completeTimerSolve';
 
 vi.mock('../features/cube', () => ({
   CubeVisualization: ({ scramble }: { scramble: string }) => (
@@ -92,9 +93,10 @@ it('edits historical notes and penalties independently, then deletes older and d
   localStorage.setItem(LANGUAGE_STORAGE_KEY, 'en');
   const a = makeSolve({ id: 'a', rawTimeMs: 13000, scramble: "F U' L2" });
   const b = makeSolve({ id: 'b', rawTimeMs: 12500 });
-  const fixture = timerApplicationFixture([a, b]);
+  const fixture = timerApplicationFixture([a]);
   render(<App {...fixture} />);
   await screen.findByText('R U2');
+  await act(() => completeTimerSolve(fixture.application, b.rawTimeMs));
   expect(screen.getByRole('timer')).toHaveTextContent('12.500');
   const older = within(screen.getAllByTestId('recent-solve')[1]!).getByRole(
     'button',
@@ -127,11 +129,11 @@ it('edits historical notes and penalties independently, then deletes older and d
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument(),
   );
   expect(screen.getByRole('timer')).toHaveTextContent('12.500');
-  await act(() => fixture.application.setPenalty('b', 'PLUS_TWO'));
+  await act(() => fixture.application.setPenalty('solve-1', 'PLUS_TWO'));
   expect(screen.getByRole('timer')).toHaveTextContent('14.500+');
-  await act(() => fixture.application.setPenalty('b', 'DNF'));
+  await act(() => fixture.application.setPenalty('solve-1', 'DNF'));
   expect(screen.getByRole('timer')).toHaveTextContent('DNF');
-  await act(() => fixture.application.deleteSolve('b'));
+  await act(() => fixture.application.deleteSolve('solve-1'));
   expect(screen.getByRole('timer')).toHaveTextContent('0.000');
 });
 

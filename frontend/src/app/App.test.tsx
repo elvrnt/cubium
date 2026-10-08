@@ -75,6 +75,9 @@ describe('Timer page', () => {
     const fixture = timerApplicationFixture([solve]);
     render(<App {...fixture} />);
     await screen.findByText('R U2');
+    fireEvent.click(
+      screen.getByTestId('recent-solve').querySelector('button')!,
+    );
     const plus = screen.getByRole('button', { name: '+2' });
     fireEvent.click(plus);
     await waitFor(() => expect(plus).toHaveAttribute('aria-pressed', 'true'));

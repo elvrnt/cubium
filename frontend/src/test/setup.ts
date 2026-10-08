@@ -9,5 +9,14 @@ globalThis.ResizeObserver = class implements ResizeObserver {
   disconnect() {}
 };
 if (typeof window !== 'undefined') window.scrollTo = () => {};
+// jsdom lacks native dialog behavior. Chromium tests verify trapping and Escape.
+if (typeof HTMLDialogElement !== 'undefined') {
+  HTMLDialogElement.prototype.showModal = function () {
+    this.setAttribute('open', '');
+  };
+  HTMLDialogElement.prototype.close = function () {
+    this.removeAttribute('open');
+  };
+}
 
 afterEach(cleanup);

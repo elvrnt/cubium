@@ -3,6 +3,7 @@ import { expect, it } from 'vitest';
 import { timerApplicationFixture } from '../../test/timerApplicationFixture';
 import { makeSolve } from '../../test/solveFixtures';
 import { MAX_SOLVE_NOTE_LENGTH, setSolveNote } from '../../domain/solves';
+import { completeTimerSolve } from '../../test/completeTimerSolve';
 
 it.each([0, 299, 300])(
   'accepts a %i-character note and preserves all other fields',
@@ -33,15 +34,17 @@ it('clears only the displayed solve after durable deletion; next completion sele
   const b = makeSolve({ id: 'b' });
   const { application: app, repository } = timerApplicationFixture([a, b]);
   await app.initialize();
-  expect(app.getState().displayedSolveId).toBe('b');
+  expect(app.getState().displayedSolveId).toBeNull();
+  await completeTimerSolve(app);
+  expect(app.getState().displayedSolveId).toBe('solve-1');
   await app.setPenalty('a', 'PLUS_TWO');
-  expect(app.getState().displayedSolveId).toBe('b');
+  expect(app.getState().displayedSolveId).toBe('solve-1');
   repository.delete.mockRejectedValueOnce(new Error('disk'));
-  await app.deleteSolve('b');
-  expect(app.getState().displayedSolveId).toBe('b');
+  await app.deleteSolve('solve-1');
+  expect(app.getState().displayedSolveId).toBe('solve-1');
   await app.retryPersistence();
   expect(app.getState().displayedSolveId).toBeNull();
-  expect(app.getState().solves.map((s) => s.id)).toEqual(['a']);
+  expect(app.getState().solves.map((s) => s.id)).toEqual(['a', 'b']);
   await app.dispatchTimerEvent({ type: 'START_KEY_DOWN', now: 0 });
   await app.dispatchTimerEvent({
     type: 'HOLD_THRESHOLD_REACHED',
@@ -51,7 +54,7 @@ it('clears only the displayed solve after durable deletion; next completion sele
   await app.dispatchTimerEvent({ type: 'START_KEY_UP', now: 400 });
   await app.dispatchTimerEvent({ type: 'STOP_KEY_DOWN', now: 1000 });
   await app.dispatchTimerEvent({ type: 'STOP_KEY_UP', now: 1001 });
-  expect(app.getState().displayedSolveId).toBe('solve-1');
+  expect(app.getState().displayedSolveId).toBe('solve-2');
   await app.deleteSolve('a');
-  expect(app.getState().displayedSolveId).toBe('solve-1');
+  expect(app.getState().displayedSolveId).toBe('solve-2');
 });

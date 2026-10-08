@@ -185,6 +185,8 @@ it('changes the hint on button focus and returns to timing on readout click with
   const fixture = timerApplicationFixture([makeSolve({ id: 'old' })]);
   render(<App {...fixture} />);
   await screen.findByText('R U2');
+  await start(fixture);
+  await stop(fixture);
   const plus = screen.getByRole('button', { name: '+2' });
   act(() => plus.focus());
   expect(screen.getByRole('timer').parentElement).toHaveTextContent(

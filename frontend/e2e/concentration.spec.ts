@@ -216,36 +216,27 @@ test('long results fit and the timer center survives an open note editor', async
   page,
 }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page.evaluate(async () => {
-    const request = indexedDB.open('CubeTrainerDB');
-    await new Promise<void>((resolve, reject) => {
-      request.onerror = () => reject(request.error);
-      request.onsuccess = () => {
-        const database = request.result;
-        const transaction = database.transaction('solves', 'readwrite');
-        transaction.objectStore('solves').put({
-          id: 'long-result',
-          event: '333',
-          scramble: 'R U2',
-          rawTimeMs: 60_000_000,
-          penalty: 'PLUS_TWO',
-          note: null,
-          createdAt: '2026-10-07T12:00:00.000Z',
-        });
-        transaction.oncomplete = () => {
-          database.close();
-          resolve();
-        };
-        transaction.onerror = () => reject(transaction.error);
-      };
-    });
-  });
-  await page.reload();
-  await expect(page.getByRole('timer')).toHaveText('1000:02.000+');
+  // Advance a real solve with a fake monotonic browser clock: reload must no
+  // longer promote a seeded historical solve into the central readout.
+  await page.clock.install();
+  await page.getByRole('timer').click();
+  await page.keyboard.down('Space');
+  await page.clock.runFor(350);
+  await expect(page.locator('.timer-readout')).toHaveAttribute(
+    'data-state',
+    'ready',
+  );
+  await page.keyboard.up('Space');
+  await page.clock.fastForward(60_000_000);
+  await page.keyboard.press('a');
+  await page.getByRole('button', { name: '+2', exact: true }).click();
+  await expect(page.getByRole('timer')).toHaveText(/^1000:\d{2}\.\d{3}\+$/);
   await centered(page);
   await page.getByRole('button', { name: 'Note', exact: true }).click();
   await page.getByRole('textbox').fill('A'.repeat(300));
-  await centered(page);
+  await expect(
+    page.getByRole('dialog', { name: 'Note for solve' }),
+  ).toBeVisible();
   for (const width of [1440, 1024, 390, 320]) {
     await page.setViewportSize({ width, height: 900 });
     expect(

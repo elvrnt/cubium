@@ -100,8 +100,13 @@ test('completes two keyboard solves, updates statistics, retains history after r
   await solve(page);
   await expect(page.getByTestId('recent-solve')).toHaveCount(2);
   const results = await page.getByTestId('recent-solve').allTextContents();
+  const statistics = await page.locator('.timer-statistics dl').innerText();
   await page.reload();
   await ready(page);
+  await expect(page.getByRole('timer')).toHaveText('0.000');
+  await expect(page.locator('.timer-statistics dl')).toHaveText(statistics, {
+    useInnerText: true,
+  });
   expect(await page.getByTestId('recent-solve').allTextContents()).toEqual(
     results,
   );
@@ -120,6 +125,7 @@ test('applies and removes +2 and persists it after reload', async ({
   await page.reload();
   await ready(page);
   await expect(page.getByTestId('recent-solve')).toHaveText(penalized);
+  await page.getByTestId('recent-solve').getByRole('button').click();
   await plus.click();
   await expect(page.getByTestId('recent-solve')).not.toHaveText(/\+$/);
 });
@@ -138,6 +144,7 @@ test('DNF replaces +2, survives reload and toggles off', async ({ page }) => {
   await page.reload();
   await ready(page);
   await expect(page.getByTestId('recent-solve')).toHaveText('DNF');
+  await page.getByTestId('recent-solve').getByRole('button').click();
   await page
     .getByRole('region', { name: 'Solve actions' })
     .getByRole('button', { name: 'DNF', exact: true })
@@ -168,6 +175,7 @@ test('edits notes with spaces without timing, supports cancel, and persists afte
   await expect(note).not.toBeVisible();
   await page.reload();
   await ready(page);
+  await page.getByTestId('recent-solve').getByRole('button').click();
   await page.getByRole('button', { name: 'Note', exact: true }).click();
   await expect(note).toHaveValue('Cross then pairs');
   await note.fill('discard');

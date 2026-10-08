@@ -15,6 +15,8 @@ import { Dialog } from './Dialog';
 import { SolveAnnouncement } from './SolveAnnouncement';
 import { useLanguage } from '../../app/i18n';
 import { useTimerPresentation } from './useTimerPresentation';
+import { useInteractionFocus } from './useInteractionFocus';
+import { SolveCreatedAt } from './SolveCreatedAt';
 import './timer.css';
 
 export function TimerPage({
@@ -33,7 +35,8 @@ export function TimerPage({
   const chrome = { inert: running, 'aria-hidden': running || undefined };
   const { t, language, setLanguage } = useLanguage();
   const timerFocusRef = useRef<HTMLElement>(null);
-  const languagePointerSelection = useRef(false);
+  const languageFocus = useInteractionFocus(timerFocusRef);
+  const historyFocus = useInteractionFocus(timerFocusRef);
   const [cubeOpen, setCubeOpen] = useState(false);
   const [statisticsHelpOpen, setStatisticsHelpOpen] = useState(false);
   const [controlFocused, setControlFocused] = useState(false);
@@ -114,21 +117,12 @@ export function TimerPage({
           <span className="sr-only">{t('Language')}</span>
           <select
             value={language}
-            onPointerDown={() => {
-              languagePointerSelection.current = true;
-            }}
-            onKeyDown={() => {
-              languagePointerSelection.current = false;
-            }}
-            onBlur={() => {
-              languagePointerSelection.current = false;
-            }}
+            onPointerDown={languageFocus.onPointerDown}
+            onKeyDown={languageFocus.onKeyDown}
+            onBlur={languageFocus.onBlur}
             onChange={(event) => {
               setLanguage(event.target.value === 'en' ? 'en' : 'ru');
-              if (languagePointerSelection.current) {
-                timerFocusRef.current?.focus({ preventScroll: true });
-              }
-              languagePointerSelection.current = false;
+              languageFocus.finishPointer();
             }}
           >
             <option value="ru">Русский</option>
@@ -224,6 +218,7 @@ export function TimerPage({
                         disabled={busy}
                         onEditingChange={setEditing}
                         onError={setActionError}
+                        timerFocusRef={timerFocusRef}
                       />
                     )}
                   </div>
@@ -332,7 +327,12 @@ export function TimerPage({
                         <button
                           disabled={busy}
                           aria-pressed={selectedId === solve.id}
-                          onClick={() => setSelectedId(solve.id)}
+                          onPointerDown={historyFocus.onPointerDown}
+                          onKeyDown={historyFocus.onKeyDown}
+                          onClick={(event) => {
+                            historyFocus.capture(event);
+                            setSelectedId(solve.id);
+                          }}
                         >
                           <span>{formatSolveTime(solve)}</span>
                           {solve.note && (
@@ -378,7 +378,16 @@ export function TimerPage({
         </Dialog>
       )}
       {selected && (
-        <Dialog title={t('Solve details')} onClose={() => setSelectedId(null)}>
+        <Dialog
+          title={t('Solve details')}
+          onClose={() => setSelectedId(null)}
+          returnFocusRef={historyFocus.returnFocusRef}
+          fallbackFocusRef={timerFocusRef}
+        >
+          <p>
+            {t('Result')} <strong>{formatSolveTime(selected)}</strong>
+          </p>
+          <SolveCreatedAt createdAt={selected.createdAt} />
           <p>
             {t('Penalty')}:{' '}
             {selected.penalty === 'NONE'
@@ -400,6 +409,7 @@ export function TimerPage({
             onEditingChange={ignoreEditingChange}
             onDeleted={() => setSelectedId(null)}
             onError={setActionError}
+            timerFocusRef={timerFocusRef}
           />
           {state.persistence.status === 'error' && (
             <div role="alert">

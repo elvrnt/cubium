@@ -125,7 +125,7 @@ export class TimerApplication {
     this.publish({
       ...collection,
       history: { status: 'ready' },
-      displayedSolveId: collection.solves.at(-1)?.id ?? null,
+      displayedSolveId: null,
       scramble: { status: 'loading' },
     });
     await this.generateScramble();

@@ -427,6 +427,19 @@
 .timer-dialog::backdrop {
   background: #18232e99;
 }
+.timer-dialog--compact {
+  width: min(460px, calc(100vw - 32px));
+}
+.timer-dialog .result-editor {
+  border: 0;
+  padding: 0;
+  margin: 16px 0 0;
+  max-width: none;
+}
+.solve-created-at {
+  color: var(--muted);
+  font-size: 0.8125rem;
+}
 .timer-dialog > header {
   display: flex;
   align-items: center;
