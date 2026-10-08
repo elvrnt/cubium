@@ -1,4 +1,5 @@
 export type { AverageResult } from './statistics';
+export { calculateStatistics } from './summary';
 export {
   calculateAo5,
   calculateAo12,

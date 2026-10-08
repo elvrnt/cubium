@@ -206,6 +206,30 @@ Use TanStack Query when backend functionality is implemented.
 
 ## Timer state machine
 
+### Browser routes and shared history
+
+React Router Data Mode owns `/` and `/results`. The browser router and production
+runtime are created outside React in `main.tsx`; pages share a single application
+coordinator and repository. Embedded/component tests use an isolated memory
+router. The language provider stays above both routes. Static hosting must serve
+`index.html` for direct product-route requests (Vite development/preview does).
+
+`TimerApplication.loadHistory()` is an idempotent, single-flight read with its
+existing load/error/Retry state. It does not generate scrambles or enable timing.
+`initialize()` shares this read, then starts generation only when the scramble
+is uninitialized; overlapping callers await the same initialization. Revisiting
+Timer preserves its current scramble and displayed result. Fresh document reload
+still begins at zero. Results reads the same immutable snapshots and uses the
+same durable mutation methods, with no direct IndexedDB access.
+
+`application/results/resultsAnalysis.ts` purely selects dates/counts and derives
+bounded-window chart series using domain statistics and effective-time rules.
+Derived records are never stored. The responsive SVG uses paths rather than
+per-solve elements, while the journal renders at most 50 records. Query state is
+presentation state, not a database field. The keyboard timer adapter is mounted
+only on Timer; cleanup cancels an incomplete hold. Route blockers protect running
+solves and open details/editors, without pausing or changing the timer engine.
+
 The framework-independent `application/timer/TimerApplication` coordinates the
 domain timer, scramble ownership, Solve creation, local repository writes, editing,
 and derived statistics. Its injected dependencies and observable state/recovery

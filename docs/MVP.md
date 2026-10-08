@@ -29,6 +29,8 @@ The MVP must be useful even with no backend connection.
 - responsive layout;
 - RU/EN localization with a remembered language preference;
 - historical solve details with local date/time;
+- the requested Results extension: full editable journal and filtered solve chart
+  (see [UI.md](UI.md#results-page));
 - accessible note/delete and enlarged-cube dialogs;
 - concentration while running;
 - basic automated tests.

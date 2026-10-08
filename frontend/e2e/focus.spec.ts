@@ -52,6 +52,10 @@ test('Tab navigation retains native language control and cube button activation'
 }) => {
   await page.keyboard.press('Tab'); // brand
   await page.keyboard.press('Tab'); // timer navigation
+  await page.keyboard.press('Tab'); // results navigation
+  await expect(
+    page.getByRole('link', { name: 'Результаты', exact: true }),
+  ).toBeFocused();
   await page.keyboard.press('Tab'); // language
   const language = page.getByRole('combobox');
   await expect(language).toBeFocused();

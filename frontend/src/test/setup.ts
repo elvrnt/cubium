@@ -1,6 +1,13 @@
 import '@testing-library/jest-dom/vitest';
 import { cleanup } from '@testing-library/react';
 import { afterEach } from 'vitest';
+import { transferableAbortController } from 'node:util';
+
+// React Router constructs Node's Request in jsdom. Its signal must come from
+// the same implementation; jsdom's AbortSignal fails Node's WebIDL brand check.
+const nodeAbort = transferableAbortController();
+globalThis.AbortController = nodeAbort.constructor as typeof AbortController;
+globalThis.AbortSignal = nodeAbort.signal.constructor as typeof AbortSignal;
 
 // jsdom has no layout engine; browser geometry is verified with Playwright.
 globalThis.ResizeObserver = class implements ResizeObserver {

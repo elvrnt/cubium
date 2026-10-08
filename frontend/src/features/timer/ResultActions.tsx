@@ -225,7 +225,11 @@ export function ResultActions({
   );
 }
 
-function PersistenceRetry({ application }: { application: TimerApplication }) {
+export function PersistenceRetry({
+  application,
+}: {
+  application: TimerApplication;
+}) {
   const { t } = useLanguage();
   return (
     <div role="alert">

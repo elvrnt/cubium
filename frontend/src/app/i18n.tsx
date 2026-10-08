@@ -2,6 +2,40 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 
 const russian = {
+  Results: 'Результаты',
+  'Page not found': 'Страница не найдена',
+  Showing: 'Показано',
+  of: 'из',
+  Range: 'Диапазон',
+  'Last 100': 'Последние 100',
+  'Last 500': 'Последние 500',
+  'All solves': 'Все сборки',
+  From: 'От',
+  To: 'До',
+  Reset: 'Сбросить',
+  'Choose valid dates; the start must not be after the end.':
+    'Укажите корректные даты: начало периода должно быть не позже окончания.',
+  'Statistics for selected solves': 'Статистика выбранных сборок',
+  'Averages use only the selected range; early points may not have enough solves.':
+    'Средние учитывают только выбранный диапазон; у первых точек может не хватать сборок.',
+  'Solve chart': 'График сборок',
+  'Individual solves': 'Отдельные сборки',
+  'Solve number': 'Номер сборки',
+  Seconds: 'Секунды',
+  'Use arrows to select a solve, Home/End for the edges and Enter for details.':
+    'Стрелки выбирают сборку, Home/End переходят к краям, Enter открывает подробности.',
+  'No numeric times in this range. DNF solves are shown in the separate band.':
+    'В диапазоне нет числовых результатов. Сборки DNF показаны в отдельной полосе.',
+  'Solve journal': 'Журнал сборок',
+  Time: 'Время',
+  Details: 'Подробнее',
+  'Open solve': 'Открыть сборку',
+  Previous: 'Назад',
+  Next: 'Далее',
+  Page: 'Страница',
+  'Journal pages': 'Страницы журнала',
+  'No solves match these filters.': 'По этим фильтрам сборок не найдено.',
+  'Go to Timer': 'Перейти к таймеру',
   Timer: 'Таймер',
   '3×3 Timer': 'Таймер 3×3',
   'Cubium home': 'Cubium — главная',

@@ -13,6 +13,8 @@ The MVP consists primarily of a high-quality 3x3 timer.
 The Timer MVP is implemented: local history and statistics, penalties, notes,
 deletion, historical details, RU/EN localization, cube enlargement and the
 Light Protocol interface with Sports Stopwatch typography and running concentration.
+The separate `/results` page adds a full editable journal, date/count filters,
+and a solve chart with optional ao5/ao12 lines. Both pages share local history.
 The backend currently exposes liveness endpoints only. Sessions, accounts,
 synchronization and the other training tools remain future work.
 
@@ -34,6 +36,7 @@ Future functionality is documented in `docs/ROADMAP.md`, but must not be impleme
 ### Current frontend
 
 - React
+- React Router (Data Mode)
 - TypeScript
 - Vite
 - IndexedDB
@@ -54,7 +57,7 @@ Future functionality is documented in `docs/ROADMAP.md`, but must not be impleme
 
 - GitHub Actions
 
-React Router, Zustand and TanStack Query are planned technologies, not installed
+Zustand and TanStack Query are planned technologies, not installed
 MVP dependencies. The current timer uses a plain TypeScript application coordinator
 and React subscriptions. SQLAlchemy, Alembic, PostgreSQL and Docker support are
 also planned and are not required to run the current project.

@@ -10,12 +10,14 @@ export function StatisticsPanel({
   onHelpOpen,
   onHelpClose,
   disabled = false,
+  selectedRange = false,
 }: {
   statistics: StatisticsSummary;
   helpOpen?: boolean;
   onHelpOpen?: () => void;
   onHelpClose?: () => void;
   disabled?: boolean;
+  selectedRange?: boolean;
 }) {
   const { t } = useLanguage();
   const helpId = useId();
@@ -41,9 +43,16 @@ export function StatisticsPanel({
     ['ao100', average(statistics.ao100)],
   ] as const;
   return (
-    <aside className="timer-statistics" aria-label={t('Statistics')}>
+    <aside
+      className="timer-statistics"
+      aria-label={t(
+        selectedRange ? 'Statistics for selected solves' : 'Statistics',
+      )}
+    >
       <div className="timer-statistics__heading">
-        <h2>{t('Statistics')}</h2>
+        <h2>
+          {t(selectedRange ? 'Statistics for selected solves' : 'Statistics')}
+        </h2>
         {onHelpOpen && (
           <button
             type="button"

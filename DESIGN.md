@@ -204,11 +204,27 @@ The language selector uses the page surface, stronger control stroke and control
 
 ### Navigation
 
-Cubium and Timer share a ruled header. The brand uses compact Golos Text (1.25rem, 600) and the cobalt cube-grid mark. The active Timer link uses cobalt text and an underline; the language control sits at the end. Compact headers wrap rather than forcing horizontal overflow.
+Cubium, Timer and Results share a ruled header. The brand uses compact Golos Text (1.25rem, 600) and the cobalt cube-grid mark. The active page link uses cobalt text and an underline; the language control sits at the end. Compact headers wrap rather than forcing horizontal overflow.
 
 ### Statistics / Recent Results
 
 The statistics strip has a fine top rule, six evenly distributed values on desktop, muted names and Cubium Golos Numeric results with lining, tabular numerals and no kerning. Best receives the cobalt accent. Help is a compact raised-paper region with the stronger stroke. Recent results are real buttons in a wrapping horizontal list, preserving numeric formatting, explicit penalty notation and selection styling.
+
+### Results analysis surface
+
+The `/results` extension keeps the Light Protocol palette and Sports Stopwatch
+fonts. Its hierarchy is title/filter row, selected-range statistics, wide chart,
+then a flat paginated journal. Page titles use 2rem (1.75rem narrow), section
+titles 1.125rem, results 1.125rem and support copy 0.8125rem. Controls retain the
+44px floor. Shared navigation identifies the active page with cobalt text and
+an underline; inactive links are muted.
+
+The chart uses muted effective-time paths, cobalt ao5, dashed Ready Green ao12
+and Delete Red DNF markers in a separate band. Labels and patterns supplement
+color. Axis numerals and the exact-value inspector use the numeric font; source
+scrambles in shared details use IBM Plex Mono. Chart geometry grows with text
+size. Mobile filters stack and journal rows reflow without page-level horizontal
+scroll. This page has neither a timer readout nor concentration mode.
 
 ### Dialogs
 

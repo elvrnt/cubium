@@ -23,8 +23,8 @@ The default `/` page uses the Light Protocol design: warm white, ink text and
 cobalt selection/focus (tokens in [DESIGN.md](../DESIGN.md)). Scramble text sits
 above the dominant timer, with the existing 2D cube on its right. Result actions,
 a horizontal six-value statistics strip, the latest 20 solves (newest first in
-presentation only) and keyboard guidance follow. Navigation contains Cubium and
-Timer. State is communicated with text and color.
+presentation only) and keyboard guidance follow. Navigation contains Cubium,
+Timer and Results. State is communicated with text and color.
 
 On desktop the digits' bounding box is centered in the initial viewport, rather
 than in the remaining space beside the cube. Status and result actions never
@@ -138,6 +138,8 @@ help is open, and its trigger is disabled during timing or unresolved writes.
 All help and announcements use the existing RU/EN dictionary.
 
 All main controls provide at least 44px targets and a cobalt focus outline.
+The neutral timer section retains keyboard focus without a surrounding outline;
+buttons, links and fields keep their visible focus indicators.
 The page has no minimum body width, so 320px screens can reflow without horizontal
 scrolling. History is explicitly labelled Last 20; state instructions use 15px text.
 Recent results are buttons with hover/focus and pressed selection styles.
@@ -295,7 +297,50 @@ While editing:
 
 ## Navigation
 
-During MVP, Timer is the only required functional product route.
+The implemented routes are `/` (Timer) and `/results` (Results), with a shared
+header and RU/EN selector. Navigation uses React Router without reloading the
+application. A running solve or open solve-details/editor task blocks internal
+navigation until it ends. Leaving holding/ready cancels that incomplete hold.
+
+## Results page
+
+Results extends Light Protocol with a visible page title, count/date filters,
+selected-range statistics, a wide SVG chart and the complete editable journal.
+There are no dashboard cards. The existing local fonts, numeric figures,
+44px controls and dialog behavior apply. Timer retains its latest 20 results.
+
+The default is the last 100 solves, no date constraint, ao5 visible and ao12
+hidden. Options are 100, 500 and all; dates filter first, then the count limit.
+Both dates are inclusive local calendar days (ending at the next local midnight,
+including DST). Invalid/reversed dates show an error rather than unrestricted
+history. Filters, series visibility and journal page are URL query parameters.
+Reset returns to defaults; refresh and Back/Forward restore URL selections.
+
+Statistics and rolling averages use only the selected records, including
+existing +2/DNF semantics. Early average points have insufficient data, not
+context borrowed from outside the selected range. The X axis uses full-history
+chronological ordinals (instant then ID); the Y axis begins at zero and includes
+all values. Effective solve time is a muted line, ao5 cobalt and ao12 dashed
+green. DNF markers occupy a labelled separate band and break numeric paths.
+DNF/insufficient averages have no numeric point. Outliers are never hidden.
+
+Hover/tap inspects exact values, local date/time, penalty and both averages;
+click opens the shared solve-details dialog. The chart has one Tab stop with
+Left/Right, Home/End and Enter controls and a textual inspector. Keyboard changes
+are politely announced; mouse hover is silent. The journal provides the same
+source information without relying on the chart or color perception.
+
+The journal shows newest first, 50 records per page; pagination never changes
+the chart or statistics. Editing uses the shared note/penalty/delete controls
+and publishes graph, journal and statistics updates only after durable writes.
+Failures retain data and provide Retry. Deleting an absent page's last result
+clamps pagination. Keyboard dialogs return to their opener, pointer dialogs to
+neutral main; deleted openers fall back there. Results has no timer shortcuts.
+
+At small widths filters stack, statistics wrap, and journal rows reflow to time,
+date and Details; full notes and ordinals remain available in the details/chart.
+Loading, read errors, empty history, no matching filters and all-DNF selections
+have distinct text and recovery actions. No sessions or new source fields exist.
 
 Do not waste significant implementation time creating unfinished pages.
 

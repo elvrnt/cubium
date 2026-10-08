@@ -7,9 +7,7 @@ export function useTimerApplication(application: TimerApplication) {
     application.getState,
   );
   useEffect(() => {
-    if (application.getState().history.status === 'uninitialized') {
-      void application.initialize();
-    }
+    void application.initialize();
   }, [application]);
   return state;
 }

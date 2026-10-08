@@ -126,23 +126,26 @@ exceptions are logged and isolated so they cannot interrupt persistence. Stable
 
 ### Public operations
 
-| Method                      | Behavior                                                                                                                                                             |
-| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `initialize()`              | Load history, derive statistics, then generate the initial scramble. Call again after load failure to retry; calls while loading or after history loaded are no-ops. |
-| `dispatchTimerEvent(event)` | Forward timestamped events to the domain synchronously. A stop's returned promise covers persistence and next generation. No external effect-handling API exists.    |
-| `getElapsedTimeMs()`        | Derive elapsed time using the injected monotonic clock, without changing state.                                                                                      |
-| `retryScramble()`           | Retry failed generation; otherwise no-op.                                                                                                                            |
-| `retryPersistence()`        | Retry the retained failed mutation; otherwise no-op.                                                                                                                 |
-| `setPenalty(id, penalty)`   | Apply `setSolvePenalty`, persist a new snapshot, update history/statistics.                                                                                          |
-| `updateNote(id, note)`      | Validate through `setSolveNote`, then persist the exact string or null; reject more than `MAX_SOLVE_NOTE_LENGTH` before writing.                                     |
-| `deleteSolve(id)`           | Persist deletion before removing the record and recalculating statistics. Unknown IDs are no-ops.                                                                    |
+| Method                      | Behavior                                                                                                                                                                       |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `loadHistory()`             | Load history and derive statistics without generating a scramble. Concurrent callers share one read; loaded history is a no-op, and read errors can be retried.                |
+| `initialize()`              | Await the shared history read, then generate the initial scramble only if uninitialized. Concurrent callers await one initialization; revisiting Timer preserves its scramble. |
+| `dispatchTimerEvent(event)` | Forward timestamped events to the domain synchronously. A stop's returned promise covers persistence and next generation. No external effect-handling API exists.              |
+| `getElapsedTimeMs()`        | Derive elapsed time using the injected monotonic clock, without changing state.                                                                                                |
+| `retryScramble()`           | Retry failed generation; otherwise no-op.                                                                                                                                      |
+| `retryPersistence()`        | Retry the retained failed mutation; otherwise no-op.                                                                                                                           |
+| `setPenalty(id, penalty)`   | Apply `setSolvePenalty`, persist a new snapshot, update history/statistics.                                                                                                    |
+| `updateNote(id, note)`      | Validate through `setSolveNote`, then persist the exact string or null; reject more than `MAX_SOLVE_NOTE_LENGTH` before writing.                                               |
+| `deleteSolve(id)`           | Persist deletion before removing the record and recalculating statistics. Unknown IDs are no-ops.                                                                              |
 
 Missing IDs for updates reject with the existing `SolveNotFoundError`. Editing
 before history loads, during holding/ready/running, or during pending/failed
 persistence rejects with a busy/not-ready error. Edits are not queued. Async
 adapter failures are represented in state and the operation resolves; callers
 must inspect state, not interpret promise resolution as success. Duplicate
-in-flight calls that are no-ops do not wait for the first operation.
+ignored timer events and in-flight retry calls do not wait for the original
+write/generation. History reads and initializations instead share their pending
+promise, so concurrent callers await the same startup operation.
 
 ### Solve creation, ordering, and recovery
 
@@ -182,8 +185,11 @@ refresh/conflict policy.
 cubing generator, performance clock and ID/date adapters. `main.tsx` creates one
 runtime outside React render and closes its repository after root unmount on HMR
 disposal. Strict Mode effect replay never creates a second runtime. The thin
-`useTimerApplication` hook subscribes with `useSyncExternalStore` and initializes
-only an uninitialized coordinator; subscriptions are cleaned up on unmount.
+`useTimerApplication` hook subscribes with `useSyncExternalStore` and calls the
+idempotent initializer on Timer mount; subscriptions are cleaned up on unmount.
+Results subscribes to the same coordinator but calls only `loadHistory()`.
+The application and repository survive internal route changes. See
+[ARCHITECTURE.md](ARCHITECTURE.md#browser-routes-and-shared-history).
 
 `features/timer/keyboardController.ts` owns browser listeners and hold timeouts.
 Space down maps idle/canArm to START_KEY_DOWN. While running, any keyboard keydown

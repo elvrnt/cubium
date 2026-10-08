@@ -4,14 +4,7 @@ import {
   setSolvePenalty,
   setSolveNote,
 } from '../../domain/solves';
-import {
-  calculateBest,
-  calculateMean,
-  calculateAo5,
-  calculateAo12,
-  calculateAo50,
-  calculateAo100,
-} from '../../domain/statistics';
+import { calculateStatistics } from '../../domain/statistics';
 import {
   createInitialTimerState,
   getElapsedTimeMs,
@@ -21,24 +14,14 @@ import type { TimerEvent } from '../../domain/timer';
 import { SolveNotFoundError } from '../../infrastructure/persistence/solveRepository';
 import type {
   PendingMutation,
-  StatisticsSummary,
   TimerApplicationDependencies,
   TimerApplicationState,
 } from './contracts';
 
-function statistics(solves: readonly Solve[]): StatisticsSummary {
-  return Object.freeze({
-    best: calculateBest(solves),
-    mean: calculateMean(solves),
-    ao5: Object.freeze(calculateAo5(solves)),
-    ao12: Object.freeze(calculateAo12(solves)),
-    ao50: Object.freeze(calculateAo50(solves)),
-    ao100: Object.freeze(calculateAo100(solves)),
-  });
-}
-
 /** One local timer use case. Injected adapters are owned and closed by the caller. */
 export class TimerApplication {
+  private historyLoad: Promise<void> | null = null;
+  private initialization: Promise<void> | null = null;
   private readonly listeners = new Set<() => void>();
   private state: TimerApplicationState = Object.freeze({
     timer: Object.freeze(createInitialTimerState()),
@@ -48,7 +31,7 @@ export class TimerApplication {
     scramble: Object.freeze({ status: 'uninitialized' }),
     persistence: Object.freeze({ status: 'idle' }),
     solves: Object.freeze([]),
-    statistics: statistics([]),
+    statistics: calculateStatistics([]),
     canArm: false,
   });
 
@@ -102,17 +85,24 @@ export class TimerApplication {
         .map((solve) => Object.freeze({ ...solve }))
         .sort(compareSolvesChronologically),
     );
-    return { solves: ordered, statistics: statistics(ordered) };
+    return { solves: ordered, statistics: calculateStatistics(ordered) };
   }
 
-  /** Idempotent after success; call again to retry a failed history load. */
-  async initialize(): Promise<void> {
-    if (
-      this.state.history.status !== 'uninitialized' &&
-      this.state.history.status !== 'error'
-    )
-      return;
+  /** Shared single-flight read. Results can load history without a scramble. */
+  loadHistory(): Promise<void> {
+    if (this.historyLoad) return this.historyLoad;
+    if (this.state.history.status === 'ready') return Promise.resolve();
+    // Defer the read so the promise is reserved before observers are notified.
+    this.historyLoad = Promise.resolve()
+      .then(() => this.readHistory())
+      .finally(() => {
+        this.historyLoad = null;
+      });
     this.publish({ history: { status: 'loading' } });
+    return this.historyLoad;
+  }
+
+  private async readHistory(): Promise<void> {
     let solves: Solve[];
     try {
       solves = await this.dependencies.solveRepository.getAll();
@@ -120,15 +110,30 @@ export class TimerApplication {
       this.publish({ history: { status: 'error', error } });
       return;
     }
-    // Reserve generation before notifying observers that history is ready.
-    const collection = this.collection(solves);
     this.publish({
-      ...collection,
+      ...this.collection(solves),
       history: { status: 'ready' },
       displayedSolveId: null,
-      scramble: { status: 'loading' },
     });
-    await this.generateScramble();
+  }
+
+  /** Idempotent startup; a successful Results read needs only scramble startup. */
+  initialize(): Promise<void> {
+    if (this.initialization) return this.initialization;
+    this.initialization = this.loadHistory()
+      .then(async () => {
+        if (
+          this.state.history.status !== 'ready' ||
+          this.state.scramble.status !== 'uninitialized'
+        )
+          return;
+        this.publish({ scramble: { status: 'loading' } });
+        await this.generateScramble();
+      })
+      .finally(() => {
+        this.initialization = null;
+      });
+    return this.initialization;
   }
 
   private async generateScramble(): Promise<void> {

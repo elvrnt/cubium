@@ -13,6 +13,10 @@ in [MVP.md](MVP.md), [UI.md](UI.md) and [TIMER.md](TIMER.md).
 Sessions and Phases 2 onward remain future work; items already shipped are not
 requirements to reimplement.
 
+The requested Results extension is also implemented: `/results` provides the
+full editable local journal, count/date filters and a solve chart with ao5/ao12.
+It shares the Timer collection and does not implement sessions or synchronization.
+
 # Phase 0 — Repository foundation
 
 Goal:

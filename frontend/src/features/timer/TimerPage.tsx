@@ -16,7 +16,9 @@ import { SolveAnnouncement } from './SolveAnnouncement';
 import { useLanguage } from '../../app/i18n';
 import { useTimerPresentation } from './useTimerPresentation';
 import { useInteractionFocus } from './useInteractionFocus';
-import { SolveCreatedAt } from './SolveCreatedAt';
+import { SolveDetails } from './SolveDetails';
+import { SiteHeader } from '../../app/SiteHeader';
+import { usePageNavigationGuard } from '../../app/usePageNavigationGuard';
 import './timer.css';
 
 export function TimerPage({
@@ -33,9 +35,8 @@ export function TimerPage({
     running,
   );
   const chrome = { inert: running, 'aria-hidden': running || undefined };
-  const { t, language, setLanguage } = useLanguage();
+  const { t } = useLanguage();
   const timerFocusRef = useRef<HTMLElement>(null);
-  const languageFocus = useInteractionFocus(timerFocusRef);
   const historyFocus = useInteractionFocus(timerFocusRef);
   const [cubeOpen, setCubeOpen] = useState(false);
   const [statisticsHelpOpen, setStatisticsHelpOpen] = useState(false);
@@ -58,6 +59,7 @@ export function TimerPage({
     [application],
   );
   const [editing, setEditing] = useState(false);
+  usePageNavigationGuard(running || editing || cubeOpen || !!selected);
   const [actionError, setActionError] = useState<unknown>(null);
   useEffect(() => {
     if (editing || cubeOpen || selected || statisticsHelpOpen) return;
@@ -88,48 +90,11 @@ export function TimerPage({
       }}
     >
       <SolveAnnouncement application={application} />
-      <header ref={headerRef} className="site-header timer-chrome" {...chrome}>
-        <a className="brand" href="/" aria-label={t('Cubium home')}>
-          <span className="brand__mark" aria-hidden="true">
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-            >
-              <rect x="2" y="2" width="20" height="20" />
-              <path d="M8.67 2v20M15.33 2v20M2 8.67h20M2 15.33h20" />
-            </svg>
-          </span>
-          Cubium
-        </a>
-        <nav aria-label={t('Main navigation')}>
-          <a href="/" aria-current="page">
-            {t('Timer')}
-          </a>
-        </nav>
-        <span className="site-header__local">
-          3×3 <span aria-hidden="true">·</span> {t('Saved on this device')}
-        </span>
-        <label className="language-selector">
-          <span className="sr-only">{t('Language')}</span>
-          <select
-            value={language}
-            onPointerDown={languageFocus.onPointerDown}
-            onKeyDown={languageFocus.onKeyDown}
-            onBlur={languageFocus.onBlur}
-            onChange={(event) => {
-              setLanguage(event.target.value === 'en' ? 'en' : 'ru');
-              languageFocus.finishPointer();
-            }}
-          >
-            <option value="ru">Русский</option>
-            <option value="en">English</option>
-          </select>
-        </label>
-      </header>
+      <SiteHeader
+        neutralRef={timerFocusRef}
+        headerRef={headerRef}
+        running={running}
+      />
       <main ref={timerFocusRef} tabIndex={-1}>
         <h1 className="sr-only">{t('3×3 Timer')}</h1>
         {state.history.status !== 'ready' ? (
@@ -378,59 +343,17 @@ export function TimerPage({
         </Dialog>
       )}
       {selected && (
-        <Dialog
-          title={t('Solve details')}
+        <SolveDetails
+          application={application}
+          solve={selected}
+          persistence={state.persistence}
+          disabled={busy}
           onClose={() => setSelectedId(null)}
+          onError={setActionError}
+          neutralRef={timerFocusRef}
           returnFocusRef={historyFocus.returnFocusRef}
-          fallbackFocusRef={timerFocusRef}
-        >
-          <p>
-            {t('Result')} <strong>{formatSolveTime(selected)}</strong>
-          </p>
-          <SolveCreatedAt createdAt={selected.createdAt} />
-          <p>
-            {t('Penalty')}:{' '}
-            {selected.penalty === 'NONE'
-              ? t('None')
-              : selected.penalty === 'PLUS_TWO'
-                ? '+2'
-                : 'DNF'}
-          </p>
-          <h3>{t('Historical scramble')}</h3>
-          <p className="scramble-notation" data-testid="historical-scramble">
-            {selected.scramble}
-          </p>
-          <ResultActions
-            key={selected.id}
-            application={application}
-            solve={selected}
-            persistence={state.persistence}
-            disabled={busy}
-            onEditingChange={ignoreEditingChange}
-            onDeleted={() => setSelectedId(null)}
-            onError={setActionError}
-            timerFocusRef={timerFocusRef}
-          />
-          {state.persistence.status === 'error' && (
-            <div role="alert">
-              <p>
-                {t(
-                  'Could not save your change. It is still held in memory. Retry before closing this page.',
-                )}
-              </p>
-              <button
-                onClick={() => {
-                  void application.retryPersistence();
-                }}
-              >
-                {t('Retry save')}
-              </button>
-            </div>
-          )}
-        </Dialog>
+        />
       )}
     </div>
   );
 }
-
-const ignoreEditingChange = () => {};

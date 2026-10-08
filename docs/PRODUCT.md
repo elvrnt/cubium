@@ -162,6 +162,14 @@ Only a new completion during the page session selects the central result.
 The cube opens in an enlarged dialog. The MVP supports Russian (default) and
 English with a locally remembered language choice; see [UI.md](UI.md).
 
+## Results analysis
+
+The requested `/results` extension exposes the full local journal with editing
+and a solve chart, while Timer retains its latest 20. Count/date selection,
+selected-range averages, DNF presentation and keyboard interaction are specified
+in [UI.md](UI.md#results-page). It uses the existing collection, without sessions,
+accounts, synchronization or changes to stored Solve records.
+
 ## Future BLD functionality
 
 Do not implement this during the MVP unless explicitly requested.

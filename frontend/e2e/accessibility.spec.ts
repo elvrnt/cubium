@@ -61,7 +61,7 @@ test('Space retains button activation, clicking the time restores hold/start and
   await expect(plus).toHaveAttribute('aria-pressed', 'true');
   // The pending write disables the button, which Chrome removes from focus.
   // Navigate back to it to verify actual focused-button keyboard behavior.
-  for (let step = 0; step < 12; step++) {
+  for (let step = 0; step < 20; step++) {
     await page.keyboard.press('Tab');
     if (await plus.evaluate((element) => element === document.activeElement))
       break;

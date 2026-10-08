@@ -128,12 +128,14 @@ describe('initialization and observation', () => {
     const load = deferred<Solve[]>();
     repository.getAll.mockReturnValueOnce(load.promise);
     const initialization = app.initialize();
-    await app.initialize();
+    const sameInitialization = app.initialize();
+    expect(sameInitialization).toBe(initialization);
+    await Promise.resolve();
     expect(repository.getAll).toHaveBeenCalledTimes(1);
     expect(scrambleGenerator.generate333).not.toHaveBeenCalled();
     expect(app.getState().history.status).toBe('loading');
     load.resolve([...rows].reverse());
-    await initialization;
+    await Promise.all([initialization, sameInitialization]);
     expect(app.getState().solves).toEqual(rows);
     expect(app.getState().statistics).toEqual({
       best: calculateBest(rows),
@@ -198,14 +200,15 @@ describe('initialization and observation', () => {
     const listener = vi.fn();
     const unsubscribe = app.subscribe(listener);
     await app.initialize();
-    expect(listener).toHaveBeenCalledTimes(3);
+    // History readiness and scramble startup are now independent notifications.
+    expect(listener).toHaveBeenCalledTimes(4);
     expect(before.history.status).toBe('uninitialized');
     expect(before.solves).toEqual([]);
     expect(Object.isFrozen(app.getState().solves[0])).toBe(true);
     expect(Object.isFrozen(app.getState().statistics.ao5)).toBe(true);
     unsubscribe();
     await start(app);
-    expect(listener).toHaveBeenCalledTimes(3);
+    expect(listener).toHaveBeenCalledTimes(4);
   });
 
   it('isolates observer exceptions from the save workflow', async () => {
