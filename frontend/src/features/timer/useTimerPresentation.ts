@@ -14,7 +14,9 @@ export function useTimerPresentation(ready: boolean, running: boolean) {
     const scramble = scrambleRef.current;
     const center = centerRef.current;
     const workspace = page?.querySelector<HTMLElement>('.timer-workspace');
-    if (!page || !header || !scramble || !center || !workspace) return;
+    const statistics = page?.querySelector<HTMLElement>('.timer-statistics');
+    if (!page || !header || !scramble || !center || !workspace || !statistics)
+      return;
     const measure = () => {
       const headerHeight = header.getBoundingClientRect().height;
       const scrambleHeight = scramble.getBoundingClientRect().height;
@@ -24,6 +26,10 @@ export function useTimerPresentation(ready: boolean, running: boolean) {
       page.style.setProperty('--header-height', `${headerHeight}px`);
       page.style.setProperty('--scramble-height', `${scrambleHeight}px`);
       page.style.setProperty('--readout-height', `${valueHeight}px`);
+      page.style.setProperty(
+        '--statistics-height',
+        `${statistics.getBoundingClientRect().height}px`,
+      );
       if (page.dataset.running !== 'true') {
         const style = getComputedStyle(workspace);
         const contentHeight =
@@ -47,6 +53,7 @@ export function useTimerPresentation(ready: boolean, running: boolean) {
     observer.observe(scramble);
     observer.observe(center);
     observer.observe(workspace);
+    observer.observe(statistics);
     window.addEventListener('resize', measure);
     return () => {
       observer.disconnect();

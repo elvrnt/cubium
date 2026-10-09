@@ -21,9 +21,10 @@ Avoid generic dashboard cards surrounding every element.
 
 The default `/` page uses the Light Protocol design: warm white, ink text and
 cobalt selection/focus (tokens in [DESIGN.md](../DESIGN.md)). Scramble text sits
-above the dominant timer, with the existing 2D cube on its right. Result actions,
-a horizontal six-value statistics strip, the latest 20 solves (newest first in
-presentation only) and keyboard guidance follow. Navigation contains Cubium,
+above the dominant timer, with a compact six-value statistics column on its left
+and the existing 2D cube on its right. Result actions remain under the time;
+48px of workspace bottom space separates this zone from the latest 20 solves
+(newest first in presentation only) and keyboard guidance. Navigation contains Cubium,
 Timer and Results. State is communicated with text and color.
 
 On desktop the digits' bounding box is centered in the initial viewport, rather
@@ -32,7 +33,10 @@ shift that anchor. The timer scrolls with the ordinary page when reading lower
 content; it is not an overlay covering history. At widths up to 760px or heights
 up to 640px the ordinary interface flows vertically. A ResizeObserver also
 chooses flowing layout when header, scramble and enlarged text leave insufficient
-space above the digits. Long times fit their container without wrapping.
+space above the digits. In flowing layouts statistics follow the timer and cube
+instead of occupying a narrow sidebar. Long times fit their container without wrapping.
+The desktop statistics column is centered vertically alongside the digits using
+its measured height, so its contents do not push the timer off its viewport anchor.
 
 ### Typography: Sports Stopwatch
 
@@ -163,12 +167,15 @@ Desktop concept:
 │                   R U2 F' L2 D R2 ...                         │
 │                                                               │
 │                                                               │
-│                         12.483              2D CUBE           │
+│ Statistics              12.483              2D CUBE           │
+│ best     11.992                                               │
+│ mean     13.125                                               │
+│ ao5      12.483                                               │
+│ ao12     13.221         Note  +2  DNF  Delete                  │
+│ ao50         —                                               │
+│ ao100        —                                               │
 │                                                               │
-│                         Note  +2  DNF  Delete                  │
 │                                                               │
-├───────────────────────────────────────────────────────────────┤
-│ best      mean      ao5      ao12      ao50      ao100          │
 ├───────────────────────────────────────────────────────────────┤
 │ Recent                                                        │
 │                                                               │

@@ -96,12 +96,13 @@
         var(--readout-height) / 2
     )
   );
-  padding-bottom: 16px;
+  padding-bottom: 48px;
 }
 .timer-center {
   position: relative;
   left: var(--viewport-offset, 0px);
   grid-column: 2;
+  grid-row: 1;
   min-width: 0;
   text-align: center;
   container-type: inline-size;
@@ -132,6 +133,7 @@
 }
 .timer-cube {
   grid-column: 3;
+  grid-row: 1;
   min-width: 0;
   width: min(100%, 200px);
   justify-self: end;
@@ -310,6 +312,55 @@
 .timer-statistics dl > div:first-child dd {
   color: var(--accent);
 }
+.timer-sidebar {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  margin-top: 32px;
+}
+@media (min-width: 761px) and (min-height: 641px) {
+  .timer-page:not([data-layout='flow']) .timer-sidebar {
+    grid-column: 1;
+    grid-row: 1;
+    box-sizing: border-box;
+    width: min(100%, 200px);
+    padding-right: 24px;
+    margin-top: calc(
+      (var(--readout-height) - var(--statistics-height, 256px)) / 2
+    );
+  }
+  .timer-page:not([data-layout='flow']) .timer-sidebar .timer-statistics {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    border-top: 0;
+    padding: 0;
+  }
+  .timer-page:not([data-layout='flow'])
+    .timer-sidebar
+    .timer-statistics__heading {
+    justify-content: space-between;
+  }
+  .timer-page:not([data-layout='flow']) .timer-sidebar dl {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+  .timer-page:not([data-layout='flow']) .timer-sidebar dl > div {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .timer-page:not([data-layout='flow']) .timer-sidebar dt {
+    margin: 0;
+  }
+  .timer-page:not([data-layout='flow']) .timer-sidebar dd {
+    text-align: right;
+    min-width: 0;
+  }
+  .timer-sidebar .statistics-help {
+    width: min(360px, calc(100vw - 32px));
+  }
+}
 .statistics-help {
   position: absolute;
   z-index: 2;
@@ -479,10 +530,12 @@
 }
 .timer-page[data-layout='flow'] .timer-workspace {
   padding-top: 32px;
+  padding-bottom: 32px;
 }
 @media (max-width: 760px), (max-height: 640px) {
   .timer-workspace {
     padding-top: 32px;
+    padding-bottom: 32px;
   }
   .timer-statistics {
     flex-direction: column;
@@ -524,9 +577,15 @@
   }
   .timer-cube {
     grid-column: 1;
+    grid-row: 2;
     justify-self: center;
     margin: 0;
     width: 180px;
+  }
+  .timer-sidebar {
+    grid-column: 1;
+    grid-row: 3;
+    margin-top: 8px;
   }
   .site-footer {
     flex-direction: column;

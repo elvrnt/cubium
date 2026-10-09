@@ -174,9 +174,9 @@ The numeric derivative preserves and centers the original Golos outlines while e
 
 The current Timer surface has a bounded page width (1480px) with responsive side padding (`clamp(16px, 3.5vw, 48px)`). Its header starts at a compact minimum height (64px). Small gaps and editor spacing follow the extracted frontmatter values rather than a new spacing scale.
 
-On ordinary desktop screens, the readout's bounding box sits at the center of the initial viewport. A three-column workspace reserves its middle column (56%) for the time and places the cube to the right. Measured header, scramble and readout heights determine the top space; captions and actions remain below the digit anchor. The resting page scrolls normally when reading history. Workspace bottom padding (16px), statistics vertical padding (8px) and history vertical padding (12px) keep the supporting strip compact without reducing the text sizes.
+On ordinary desktop screens, the readout's bounding box sits at the center of the initial viewport. A three-column workspace reserves its middle column (56%) for the time, places compact statistics to the left and the cube to the right. Measured header, scramble and readout heights determine the top space; captions and actions remain below the digit anchor. The measured statistics height centers the sidebar alongside the digits without moving them. The resting page scrolls normally when reading history. Workspace bottom padding (48px) leaves generous space below the timer and its actions before history; statistics remain close at hand beside it.
 
-At widths up to (760px) or heights up to (640px), the workspace uses flowing vertical spacing (32px) and statistics become three columns. Narrow screens also stack the cube below the timer, wrap the header and actions, hide the local-storage header caption and stack footer guidance. A measured copy-collision check independently selects flowing spacing when enlarged copy needs it. The page has no minimum body width.
+At widths up to (760px) or heights up to (640px), the workspace uses flowing vertical spacing (32px) and statistics follow the timer/cube instead of occupying the sidebar. Small-screen statistics use three columns. Narrow screens also stack the cube below the timer, wrap the header and actions, hide the local-storage header caption and stack footer guidance. A measured copy-collision check independently selects flowing spacing when enlarged copy needs it. The page has no minimum body width.
 
 These are implemented Timer composition rules, not a mandate for unimplemented future screens. The current surface contract is `.impeccable/surfaces/timer.md` and detailed behavior is in `docs/UI.md`.
 
@@ -208,7 +208,7 @@ Cubium, Timer and Results share a ruled header. The brand uses compact Golos Tex
 
 ### Statistics / Recent Results
 
-The statistics strip has a fine top rule, six evenly distributed values on desktop, muted names and Cubium Golos Numeric results with lining, tabular numerals and no kerning. Best receives the cobalt accent. Help is a compact raised-paper region with the stronger stroke. Recent results are real buttons in a wrapping horizontal list, preserving numeric formatting, explicit penalty notation and selection styling.
+Timer statistics form a quiet left column on desktop, with six label/value rows and right-aligned measurements. Flowing Timer layouts and the Results page retain a ruled statistics strip. Names are muted and Cubium Golos Numeric results use lining, tabular numerals with no kerning. Best receives the cobalt accent. Help is a compact raised-paper region with the stronger stroke. Recent results are real buttons in a wrapping horizontal list, preserving numeric formatting, explicit penalty notation and selection styling.
 
 ### Results analysis surface
 

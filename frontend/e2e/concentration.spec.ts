@@ -67,6 +67,18 @@ for (const [width, height] of [
   }) => {
     await page.setViewportSize({ width, height });
     const font = await centered(page);
+    const statistics = page.getByRole('complementary', { name: 'Statistics' });
+    const statsBox = await statistics.boundingBox();
+    const timeBox = await page.getByRole('timer').boundingBox();
+    const historyBox = await page.locator('.recent-solves').boundingBox();
+    const centerBox = await page.locator('.timer-center').boundingBox();
+    expect(statsBox!.x + statsBox!.width).toBeLessThan(timeBox!.x);
+    expect(
+      Math.abs(statsBox!.y + statsBox!.height / 2 - height / 2),
+    ).toBeLessThan(1);
+    expect(
+      historyBox!.y - (centerBox!.y + centerBox!.height),
+    ).toBeGreaterThanOrEqual(47);
     await settleCube(page);
     await page.screenshot({
       path: `../.impeccable/review/${width === 1440 ? 'desktop' : `desktop-${width}`}.png`,
@@ -79,6 +91,7 @@ for (const [width, height] of [
       'holding',
     );
     await expect(page.getByTestId('scramble')).toBeVisible();
+    await expect(statistics).toBeVisible();
     await expect(page.locator('.timer-readout')).toHaveAttribute(
       'data-state',
       'ready',
@@ -90,10 +103,12 @@ for (const [width, height] of [
       'true',
     );
     expect(await centered(page)).toBe(font);
+    await expect(statistics).toBeHidden();
     if (width === 1440)
       await page.screenshot({ path: '../.impeccable/review/running.png' });
     await page.keyboard.down('KeyA');
     await expect(page.getByRole('banner')).toBeVisible();
+    await expect(statistics).toBeVisible();
     await expect(page.getByTestId('scramble')).toBeVisible();
     expect(await centered(page)).toBe(font);
     await page.keyboard.up('KeyA');
@@ -159,8 +174,10 @@ for (const [width, height] of [
     const scramble = await page.getByTestId('scramble').boundingBox();
     const digits = await page.getByRole('timer').boundingBox();
     const cube = await page.locator('.timer-cube').boundingBox();
+    const statistics = await page.locator('.timer-statistics').boundingBox();
     expect(scramble!.y + scramble!.height).toBeLessThan(digits!.y);
     expect(digits!.y + digits!.height).toBeLessThan(cube!.y);
+    expect(cube!.y + cube!.height).toBeLessThan(statistics!.y);
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,

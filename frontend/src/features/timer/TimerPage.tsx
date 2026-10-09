@@ -226,16 +226,16 @@ export function TimerPage({
                   )}
                   <p>{t('State after the scramble')}</p>
                 </aside>
+                <div className="timer-sidebar timer-chrome" {...chrome}>
+                  <StatisticsPanel
+                    statistics={state.statistics}
+                    helpOpen={statisticsHelpOpen}
+                    disabled={busy}
+                    onHelpOpen={() => setStatisticsHelpOpen(true)}
+                    onHelpClose={closeStatisticsHelp}
+                  />
+                </div>
               </div>
-            </div>
-            <div className="timer-chrome" {...chrome}>
-              <StatisticsPanel
-                statistics={state.statistics}
-                helpOpen={statisticsHelpOpen}
-                disabled={busy}
-                onHelpOpen={() => setStatisticsHelpOpen(true)}
-                onHelpClose={closeStatisticsHelp}
-              />
             </div>
             <div className="timer-notices timer-chrome" {...chrome}>
               {state.persistence.status === 'saving' && (
