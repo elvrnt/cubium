@@ -75,22 +75,33 @@ export function SolveChart({
   const bottom = height - font * 3;
   // Cursor movement changes only the inspector/selection, not 10,000 path points.
   const geometry = useMemo(() => {
-    let max = 1000;
-    for (const point of points)
+    let max = 0;
+    let minimum = Infinity;
+    for (const point of points) {
+      if (point.timeMs !== null) minimum = Math.min(minimum, point.timeMs);
       max = Math.max(
         max,
         point.timeMs ?? 0,
         ao5 ? (averageTime(point.ao5) ?? 0) : 0,
         ao12 ? (averageTime(point.ao12) ?? 0) : 0,
       );
-    const ceiling = Math.ceil(max / 1000) * 1000;
+    }
+    if (!Number.isFinite(minimum)) minimum = 0;
+    // A positive range keeps a single/repeated time and an all-DNF chart valid.
+    const ceiling = Math.max(
+      minimum + (max === minimum ? 1000 : 0),
+      Math.ceil(max / 1000) * 1000,
+      1000,
+    );
     const x = (index: number) =>
       points.length <= 1
         ? (left + right) / 2
         : left + (index / (points.length - 1)) * (right - left);
-    const y = (time: number) => bottom - (time / ceiling) * (bottom - top);
+    const y = (time: number) =>
+      bottom - ((time - minimum) / (ceiling - minimum)) * (bottom - top);
     return {
       ceiling,
+      minimum,
       x,
       y,
       solves: chartPath(points, (point) => point.timeMs, x, y),
@@ -114,7 +125,7 @@ export function SolveChart({
         .join(' '),
     };
   }, [points, ao5, ao12, left, right, bottom, top, bandY]);
-  const { ceiling, x, y, dnf, markers } = geometry;
+  const { ceiling, minimum, x, y, dnf, markers } = geometry;
   const pick = (clientX: number) => {
     const bounds = region.current!.getBoundingClientRect();
     const index = Math.max(
@@ -134,7 +145,7 @@ export function SolveChart({
   const locale = language === 'ru' ? 'ru-RU' : 'en-US';
   const axisFormat = new Intl.NumberFormat(locale, {
     notation: 'compact',
-    maximumFractionDigits: 1,
+    maximumFractionDigits: 3,
   });
   return (
     <section className="solve-chart">
@@ -211,7 +222,7 @@ export function SolveChart({
           </text>
           <path d={`M${left},${font * 2.75}H${right}`} className="chart-grid" />
           {[0, 1, 2, 3, 4].map((tick) => {
-            const time = (ceiling * tick) / 4;
+            const time = minimum + ((ceiling - minimum) * tick) / 4;
             return (
               <g key={tick}>
                 <path
@@ -291,7 +302,7 @@ export function SolveChart({
           </text>
         </svg>
       </div>
-      <p id={descriptionId} className="results-help">
+      <p id={descriptionId} className="sr-only">
         {t(
           'Use arrows to select a solve, Home/End for the edges and Enter for details.',
         )}

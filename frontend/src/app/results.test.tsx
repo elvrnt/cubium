@@ -36,6 +36,39 @@ function setup(solves: Solve[] = [], entry = '/results', renderNow = true) {
   return { ...f, router, mount };
 }
 
+it.each([
+  [makeSolves([12345, 14567]), '12.345'],
+  [makeSolves([9000, 9000]), '9'],
+  [
+    [
+      makeSolve({ id: 'dnf', rawTimeMs: 1000, penalty: 'DNF' }),
+      makeSolve({ id: 'plus', rawTimeMs: 9000, penalty: 'PLUS_TWO' }),
+      makeSolve({ id: 'plain', rawTimeMs: 10000 }),
+    ],
+    '10',
+  ],
+])(
+  'starts the chart at the minimum effective solve time with finite geometry',
+  async (solves, expected) => {
+    setup(solves);
+    const chart = await screen.findByRole('region', { name: 'Solve chart' });
+    expect(chart.querySelector('text.chart-number')).toHaveTextContent(
+      expected,
+    );
+    for (const path of chart.querySelectorAll('path')) {
+      expect(path.getAttribute('d')).not.toMatch(/NaN|Infinity/);
+    }
+    const guidance = screen.getByText(
+      'Use arrows to select a solve, Home/End for the edges and Enter for details.',
+    );
+    expect(guidance).toHaveClass('sr-only');
+    expect(chart).toHaveAttribute(
+      'aria-describedby',
+      expect.stringContaining(guidance.id),
+    );
+  },
+);
+
 it('loads directly without scramble generation, defaults to 100 and pages only the journal', async () => {
   const f = setup(makeSolves(Array(150).fill(12000)));
   await screen.findByRole('region', { name: 'Solve chart' });
