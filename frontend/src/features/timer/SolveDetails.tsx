@@ -1,6 +1,6 @@
+import { useTimePreferences } from '../../app/TimePreferences';
 import type { RefObject } from 'react';
 import type { Solve } from '../../domain/solves';
-import { formatSolveTime, formatTimeMs } from '../../domain/solves';
 import type { AverageResult } from '../../domain/statistics';
 import type {
   TimerApplication,
@@ -35,6 +35,7 @@ export function SolveDetails({
   averages?: { ao5: AverageResult; ao12: AverageResult };
 }) {
   const { t } = useLanguage();
+  const { formatSolveTime, formatTimeMs } = useTimePreferences();
   return (
     <Dialog
       title={t('Solve details')}

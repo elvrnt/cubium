@@ -1,4 +1,5 @@
 .timer-page {
+  overflow-wrap: anywhere;
   --header-height: 64px;
   --scramble-height: 112px;
   --time-size: clamp(64px, 10vw, 144px);
@@ -17,6 +18,8 @@
 }
 .brand {
   display: inline-flex;
+  flex-wrap: wrap;
+  max-width: 100%;
   align-items: center;
   gap: 10px;
   min-height: 44px;
@@ -32,6 +35,7 @@
 }
 .site-header nav a {
   display: flex;
+  max-width: 100%;
   align-items: center;
   min-height: 62px;
   color: var(--muted);
@@ -41,6 +45,7 @@
 }
 .site-header nav {
   display: flex;
+  flex-wrap: wrap;
   gap: 24px;
 }
 .site-header nav a[aria-current='page'] {
@@ -204,19 +209,6 @@
 .result-actions {
   margin-top: 16px;
 }
-.result-actions__caption {
-  font-size: 0.8125rem;
-  color: var(--muted);
-  margin: 0 0 8px;
-}
-.result-actions__caption strong {
-  font-family: var(--font-numeric);
-  font-weight: 500;
-  color: var(--ink);
-  margin-left: 8px;
-  font-variant-numeric: lining-nums tabular-nums;
-  font-kerning: none;
-}
 .result-actions__buttons {
   display: flex;
   justify-content: center;
@@ -275,6 +267,7 @@
 }
 .timer-statistics__heading {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
 }
@@ -621,4 +614,48 @@
   .timer-page[data-running='true'] .timer-center {
     width: calc(100vw - 2 * clamp(16px, 3.5vw, 48px));
   }
+}
+
+.timer-page .icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  padding: 10px;
+}
+
+.timer-settings {
+  display: grid;
+  gap: 24px;
+  margin-top: 24px;
+}
+.timer-page .timer-settings label {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.timer-dialog:has(.timer-settings) h2 {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.timer-page .timer-settings select {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 8px;
+  font: inherit;
+  color: var(--ink);
+  background: var(--surface-raised);
+  border: 1px solid var(--control-border);
+  border-radius: 4px;
+}
+.timer-settings p {
+  color: var(--muted);
+  font-size: 0.8125rem;
+  margin: 0;
+  overflow-wrap: anywhere;
 }

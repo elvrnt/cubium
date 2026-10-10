@@ -2,6 +2,14 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 
 const russian = {
+  'Timer settings': 'Настройки таймера',
+  'While running': 'Во время сборки',
+  'Whole seconds': 'Целые секунды',
+  Tenths: 'Десятые',
+  Hundredths: 'Сотые',
+  Thousandths: 'Тысячные',
+  'Saved on this device. Display precision does not change measured or saved times.':
+    'Сохраняется на этом устройстве. Формат отображения не меняет измеренное и сохранённое время.',
   Session: 'Сессия',
   'Manage sessions': 'Управление сессиями',
   'Create session': 'Создать сессию',

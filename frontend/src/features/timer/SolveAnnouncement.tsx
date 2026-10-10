@@ -1,7 +1,7 @@
+import { useTimePreferences } from '../../app/TimePreferences';
 import { useEffect, useRef, useState } from 'react';
 import type { TimerApplication } from '../../application/timer';
 import type { Solve } from '../../domain/solves';
-import { formatSolveTime } from '../../domain/solves';
 import { useLanguage } from '../../app/i18n';
 
 /** Observe completion synchronously: React can batch stop and key release together. */
@@ -11,6 +11,7 @@ export function SolveAnnouncement({
   application: TimerApplication;
 }) {
   const { t } = useLanguage();
+  const { formatSolveTime } = useTimePreferences();
   const lastCompleted = useRef<Readonly<Solve> | null>(null);
   const [message, setMessage] = useState('');
   useEffect(
@@ -45,7 +46,7 @@ export function SolveAnnouncement({
           setMessage(`${t('Result updated')}: ${formatSolveTime(current)}`);
         }
       }),
-    [application, t],
+    [application, t, formatSolveTime],
   );
   return (
     <div

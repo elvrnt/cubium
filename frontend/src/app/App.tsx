@@ -4,6 +4,7 @@ import type { TimerApplication } from '../application/timer';
 import type { TimerClock } from '../domain/timer';
 import { createAppRoutes } from './router';
 import { LanguageProvider } from './i18n';
+import { TimePreferencesProvider } from './TimePreferences';
 
 export function App({
   application,
@@ -24,7 +25,9 @@ export function App({
   );
   return (
     <LanguageProvider>
-      <RouterProvider router={router} />
+      <TimePreferencesProvider>
+        <RouterProvider router={router} />
+      </TimePreferencesProvider>
     </LanguageProvider>
   );
 }

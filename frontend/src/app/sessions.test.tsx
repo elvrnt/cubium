@@ -27,6 +27,12 @@ async function prepare(path = '/') {
 async function create(name: string) {
   fireEvent.click(screen.getByRole('button', { name: 'Manage sessions' }));
   const dialog = screen.getByRole('dialog', { name: 'Manage sessions' });
+  for (const name of ['Close', 'Create session']) {
+    const button = within(dialog).getByRole('button', { name });
+    expect(button.textContent).toBe('');
+    expect(button).toHaveAttribute('title', name);
+    expect(button.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
+  }
   fireEvent.click(
     within(dialog).getByRole('button', { name: 'Create session' }),
   );
@@ -34,6 +40,9 @@ async function create(name: string) {
     within(dialog).getByRole('textbox', { name: 'Session name' }),
     { target: { value: name } },
   );
+  expect(
+    within(dialog).getByRole('button', { name: 'Save session' }).textContent,
+  ).toBe('');
   fireEvent.click(within(dialog).getByRole('button', { name: 'Save session' }));
   await waitFor(() => expect(within(dialog).queryByRole('textbox')).toBeNull());
   return dialog;

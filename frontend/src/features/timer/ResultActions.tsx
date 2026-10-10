@@ -1,10 +1,12 @@
+import { useTimePreferences } from '../../app/TimePreferences';
+import { IconButton } from '../shared/IconButton';
 import { useEffect, useId, useRef, useState } from 'react';
 import type { RefObject } from 'react';
 import type {
   TimerApplication,
   TimerApplicationState,
 } from '../../application/timer';
-import { formatSolveTime, MAX_SOLVE_NOTE_LENGTH } from '../../domain/solves';
+import { MAX_SOLVE_NOTE_LENGTH } from '../../domain/solves';
 import type { Solve, SolvePenalty } from '../../domain/solves';
 import { useLanguage } from '../../app/i18n';
 import { Dialog } from './Dialog';
@@ -31,6 +33,7 @@ export function ResultActions({
   timerFocusRef: RefObject<HTMLElement | null>;
 }) {
   const { t } = useLanguage();
+  const { formatSolveTime } = useTimePreferences();
   const noteId = useId();
   const countId = useId();
   const [editor, setEditor] = useState<'note' | 'delete' | null>(null);
@@ -62,11 +65,8 @@ export function ResultActions({
   };
   return (
     <section className="result-actions" aria-label={t('Solve actions')}>
-      <p className="result-actions__caption">
-        {t('Result')} <strong>{formatSolveTime(solve)}</strong>
-      </p>
       <div className="result-actions__buttons">
-        <button
+        <IconButton
           onPointerDown={focus.onPointerDown}
           onKeyDown={focus.onKeyDown}
           disabled={disabled}
@@ -75,9 +75,10 @@ export function ResultActions({
             setNote(solve.note ?? '');
             setEditor('note');
           }}
-        >
-          {t('Note')}
-        </button>
+
+          icon="note"
+          label={t('Note')}
+        />
         <button
           disabled={disabled}
           aria-pressed={solve.penalty === 'PLUS_TWO'}
@@ -92,7 +93,7 @@ export function ResultActions({
         >
           DNF
         </button>
-        <button
+        <IconButton
           onPointerDown={focus.onPointerDown}
           onKeyDown={focus.onKeyDown}
           disabled={disabled}
@@ -100,9 +101,10 @@ export function ResultActions({
             focus.capture(event);
             setEditor('delete');
           }}
-        >
-          {t('Delete')}
-        </button>
+
+          icon="delete"
+          label={t('Delete')}
+        />
       </div>
       {editor === null && solve.note !== null && solve.note !== '' && (
         <p className="result-actions__note">{solve.note}</p>
@@ -154,12 +156,18 @@ export function ResultActions({
               )}
             </p>
             <div>
-              <button type="submit" disabled={disabled || invalidNote}>
-                {t('Save note')}
-              </button>
-              <button type="button" onClick={close}>
-                {t('Cancel')}
-              </button>
+              <IconButton
+                type="submit"
+                disabled={disabled || invalidNote}
+                icon="check"
+                label={t('Save note')}
+              />
+              <IconButton
+                type="button"
+                onClick={close}
+                icon="close"
+                label={t('Cancel')}
+              />
             </div>
           </form>
           {persistence.status === 'error' && (
@@ -192,7 +200,7 @@ export function ResultActions({
             </p>
             <SolveCreatedAt createdAt={solve.createdAt} />
             <div>
-              <button
+              <IconButton
                 className="danger"
                 disabled={disabled}
                 onClick={() => {
@@ -208,12 +216,16 @@ export function ResultActions({
                     })
                     .catch(onError);
                 }}
-              >
-                {t('Confirm delete')}
-              </button>
-              <button ref={cancelDelete} onClick={close}>
-                {t('Cancel')}
-              </button>
+
+                icon="delete"
+                label={t('Confirm delete')}
+              />
+              <IconButton
+                ref={cancelDelete}
+                onClick={close}
+                icon="close"
+                label={t('Cancel')}
+              />
             </div>
           </div>
           {persistence.status === 'error' && (

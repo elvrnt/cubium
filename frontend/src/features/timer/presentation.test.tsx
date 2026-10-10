@@ -3,6 +3,7 @@ import { expect, it, vi } from 'vitest';
 import { TimerDisplay } from './TimerDisplay';
 import { StatisticsPanel } from './StatisticsPanel';
 import { timerApplicationFixture } from '../../test/timerApplicationFixture';
+import { makeSolve } from '../../test/solveFixtures';
 
 it('formats numeric statistics, DNF, and unavailable averages', () => {
   render(
@@ -41,7 +42,9 @@ it('runs one frame loop only while running and cancels on stop and unmount', () 
     .spyOn(window, 'cancelAnimationFrame')
     .mockImplementation(() => {});
   try {
-    const state = application.getState();
+    const original = application.getState();
+    const solve = makeSolve({ rawTimeMs: 8341 });
+    const state = { ...original, solves: [solve], displayedSolveId: solve.id };
     const { rerender, unmount } = render(
       <TimerDisplay application={application} state={state} />,
     );
@@ -54,9 +57,9 @@ it('runs one frame loop only while running and cancels on stop and unmount', () 
     );
     expect(raf).toHaveBeenCalledTimes(1);
     act(() => frame(0));
-    expect(screen.getByRole('timer')).toHaveTextContent('8.341');
+    expect(screen.getByRole('timer')).toHaveTextContent(/^8\.34$/);
     expect(read).toHaveBeenCalledTimes(1);
-    expect(application.getState()).toBe(state);
+    expect(application.getState()).toBe(original);
     rerender(
       <TimerDisplay
         application={application}
@@ -72,6 +75,7 @@ it('runs one frame loop only while running and cancels on stop and unmount', () 
       />,
     );
     expect(cancel).toHaveBeenCalledExactlyOnceWith(42);
+    expect(screen.getByRole('timer')).toHaveTextContent(/^8\.341$/);
     rerender(
       <TimerDisplay
         application={application}
@@ -84,5 +88,39 @@ it('runs one frame loop only while running and cancels on stop and unmount', () 
     raf.mockRestore();
     cancel.mockRestore();
     read.mockRestore();
+  }
+});
+
+it.each([
+  [999.9, '0.99'],
+  [1000, '1.00'],
+  [59999.9, '59.99'],
+  [60000, '1:00.00'],
+  [63582.8, '1:03.58'],
+])('shows hundredths by default while running at %s ms', (elapsed, text) => {
+  const { application } = timerApplicationFixture();
+  vi.spyOn(application, 'getElapsedTimeMs').mockReturnValue(elapsed);
+  let frame!: FrameRequestCallback;
+  const raf = vi
+    .spyOn(window, 'requestAnimationFrame')
+    .mockImplementation((callback) => {
+      frame = callback;
+      return 42;
+    });
+  try {
+    render(
+      <TimerDisplay
+        application={application}
+        state={{
+          ...application.getState(),
+          timer: { status: 'running', startedAt: 0 },
+        }}
+      />,
+    );
+    act(() => frame(0));
+    expect(screen.getByRole('timer').textContent).toBe(text);
+  } finally {
+    raf.mockRestore();
+    vi.restoreAllMocks();
   }
 });

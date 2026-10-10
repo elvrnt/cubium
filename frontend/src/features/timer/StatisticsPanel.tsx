@@ -1,7 +1,8 @@
+import { useTimePreferences } from '../../app/TimePreferences';
+import { IconButton } from '../shared/IconButton';
 import { useEffect, useId, useRef } from 'react';
 import type { StatisticsSummary } from '../../application/timer';
 import type { AverageResult } from '../../domain/statistics';
-import { formatTimeMs } from '../../domain/solves';
 import { useLanguage } from '../../app/i18n';
 
 export function StatisticsPanel({
@@ -20,6 +21,7 @@ export function StatisticsPanel({
   selectedRange?: boolean;
 }) {
   const { t } = useLanguage();
+  const { formatTimeMs } = useTimePreferences();
   const helpId = useId();
   const helpTitleId = useId();
   const helpRef = useRef<HTMLDivElement>(null);
@@ -104,9 +106,12 @@ export function StatisticsPanel({
               '— means there is not enough data yet. Averages exclude the best and worst results; if a DNF remains, the average is DNF.',
             )}
           </p>
-          <button type="button" onClick={onHelpClose}>
-            {t('Close')}
-          </button>
+          <IconButton
+            type="button"
+            onClick={onHelpClose}
+            icon="close"
+            label={t('Close')}
+          />
         </div>
       )}
       <dl>

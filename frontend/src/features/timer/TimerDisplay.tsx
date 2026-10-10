@@ -3,7 +3,8 @@ import type {
   TimerApplication,
   TimerApplicationState,
 } from '../../application/timer';
-import { formatSolveTime, formatTimeMs } from '../../domain/solves';
+import { useTimePreferences } from '../../app/TimePreferences';
+import { formatDisplayTimeMs } from './timeFormatting';
 import { useLanguage } from '../../app/i18n';
 
 function TimeValue({ text }: { text: string }) {
@@ -22,6 +23,7 @@ function TimeValue({ text }: { text: string }) {
 }
 
 function RunningTime({ application }: { application: TimerApplication }) {
+  const { runningDecimals } = useTimePreferences();
   const [elapsed, setElapsed] = useState(0);
   useEffect(() => {
     let frame: number;
@@ -32,7 +34,7 @@ function RunningTime({ application }: { application: TimerApplication }) {
     frame = requestAnimationFrame(renderFrame);
     return () => cancelAnimationFrame(frame);
   }, [application]);
-  return <TimeValue text={formatTimeMs(elapsed)} />;
+  return <TimeValue text={formatDisplayTimeMs(elapsed, runningDecimals)} />;
 }
 
 export function TimerDisplay({
@@ -47,6 +49,7 @@ export function TimerDisplay({
   running?: boolean;
 }) {
   const { t } = useLanguage();
+  const { formatSolveTime, formatTimeMs } = useTimePreferences();
   const displayed = state.solves.find(
     (solve) => solve.id === state.displayedSolveId,
   );
@@ -74,7 +77,7 @@ export function TimerDisplay({
           text={
             ['idle', 'stopped'].includes(state.timer.status) && restingResult
               ? formatSolveTime(restingResult)
-              : '0.000'
+              : formatTimeMs(0)
           }
         />
       )}

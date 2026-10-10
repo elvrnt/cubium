@@ -131,6 +131,7 @@ test('running hides all chrome, retains its DOM, keeps neutral focus and restore
     .evaluate((element) => element.setAttribute('data-preserved', 'yes'));
   await start(page);
   await expect(page.getByRole('timer')).toBeVisible();
+  await expect(page.getByRole('timer')).toHaveText(/^\d+(?::\d{2})?\.\d{2}$/);
   await expect(page.getByRole('button')).toHaveCount(0);
   await expect(page.getByRole('link')).toHaveCount(0);
   await expect(page.getByRole('combobox')).toHaveCount(0);
@@ -157,6 +158,17 @@ test('running hides all chrome, retains its DOM, keeps neutral focus and restore
   await page.keyboard.down('Tab'); // browser repeat must not save a second solve
   await page.keyboard.up('Tab');
   await expect(page.getByTestId('recent-solve')).toHaveCount(1);
+  await expect(page.getByRole('timer')).toHaveText(/^\d+(?::\d{2})?\.\d{3}$/);
+  await expect(page.locator('.timer-center .result-actions')).not.toContainText(
+    'Result',
+  );
+  const note = page.getByRole('button', { name: 'Note', exact: true });
+  await expect(note).toHaveText('');
+  await expect(note).toHaveAttribute('title', 'Note');
+  await expect(note.locator('svg')).toHaveAttribute('aria-hidden', 'true');
+  const target = await note.boundingBox();
+  expect(target!.width).toBeGreaterThanOrEqual(44);
+  expect(target!.height).toBeGreaterThanOrEqual(44);
   await expect(
     page.getByRole('combobox', { name: /Language|Язык/ }),
   ).toHaveAttribute('data-preserved', 'yes');

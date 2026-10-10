@@ -98,6 +98,17 @@ it('restores chrome on stop keydown before saving completes and never saves dupl
   await waitFor(() =>
     expect(screen.getByTestId('recent-solve')).toBeInTheDocument(),
   );
+  const note = screen.getByRole('button', { name: 'Note' });
+  expect(note).toHaveAttribute('title', 'Note');
+  expect(note.textContent).toBe('');
+  expect(note.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
+  expect(screen.getByRole('button', { name: 'Delete' })).toHaveAttribute(
+    'title',
+    'Delete',
+  );
+  expect(screen.getByRole('button', { name: '+2' })).toHaveTextContent('+2');
+  expect(screen.getByRole('button', { name: 'DNF' })).toHaveTextContent('DNF');
+  expect(screen.queryByText('Result')).toBeNull();
   expect(screen.getByTestId('solve-announcement')).toHaveTextContent(
     'Solve completed: 1.241',
   );

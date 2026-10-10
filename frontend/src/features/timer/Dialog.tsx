@@ -1,3 +1,4 @@
+import { IconButton } from '../shared/IconButton';
 import { useEffect, useId, useRef } from 'react';
 import type { ReactNode, RefObject } from 'react';
 import { useLanguage } from '../../app/i18n';
@@ -103,9 +104,12 @@ export function Dialog({
     >
       <header>
         <h2 id={titleId}>{title}</h2>
-        <button onClick={onClose} autoFocus>
-          {t('Close')}
-        </button>
+        <IconButton
+          onClick={onClose}
+          autoFocus
+          icon="close"
+          label={t('Close')}
+        />
       </header>
       {children}
     </dialog>

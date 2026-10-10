@@ -1,7 +1,8 @@
+import { useTimePreferences } from '../../app/TimePreferences';
+import { IconButton } from '../shared/IconButton';
 import { useEffect, useRef, useState } from 'react';
 import type { TimerApplication } from '../../application/timer';
 import type { TimerClock } from '../../domain/timer';
-import { formatSolveTime } from '../../domain/solves';
 import { CubeVisualization } from '../cube';
 import {
   attachTimerKeyboard,
@@ -22,6 +23,7 @@ import { usePageNavigationGuard } from '../../app/usePageNavigationGuard';
 import './timer.css';
 import { SessionControls } from '../sessions/SessionControls';
 import { DatabaseBlockedError } from '../../infrastructure/persistence';
+import { TimerSettings } from './TimerSettings';
 
 export function TimerPage({
   application,
@@ -38,6 +40,7 @@ export function TimerPage({
   );
   const chrome = { inert: running, 'aria-hidden': running || undefined };
   const { t } = useLanguage();
+  const { formatSolveTime } = useTimePreferences();
   const timerFocusRef = useRef<HTMLElement>(null);
   const historyFocus = useInteractionFocus(timerFocusRef);
   const [cubeOpen, setCubeOpen] = useState(false);
@@ -62,8 +65,14 @@ export function TimerPage({
   );
   const [editing, setEditing] = useState(false);
   const [sessionsOpen, setSessionsOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   usePageNavigationGuard(
-    running || editing || cubeOpen || !!selected || sessionsOpen,
+    running ||
+      editing ||
+      cubeOpen ||
+      !!selected ||
+      sessionsOpen ||
+      settingsOpen,
   );
   useEffect(() => {
     application.setEditingBlocked(editing || !!selected);
@@ -71,7 +80,14 @@ export function TimerPage({
   }, [application, editing, selected]);
   const [actionError, setActionError] = useState<unknown>(null);
   useEffect(() => {
-    if (editing || cubeOpen || selected || statisticsHelpOpen || sessionsOpen)
+    if (
+      editing ||
+      cubeOpen ||
+      selected ||
+      statisticsHelpOpen ||
+      sessionsOpen ||
+      settingsOpen
+    )
       return;
     return attachTimerKeyboard(application, clock, setActionError);
   }, [
@@ -82,6 +98,7 @@ export function TimerPage({
     selected,
     statisticsHelpOpen,
     sessionsOpen,
+    settingsOpen,
   ]);
   const displayed = state.solves.find(
     (solve) => solve.id === state.displayedSolveId,
@@ -118,10 +135,28 @@ export function TimerPage({
         state={state}
         neutralRef={timerFocusRef}
         disabled={
-          busy || editing || cubeOpen || !!selected || statisticsHelpOpen
+          busy ||
+          editing ||
+          cubeOpen ||
+          !!selected ||
+          statisticsHelpOpen ||
+          settingsOpen
         }
         onOpenChange={setSessionsOpen}
-      />
+      >
+        <TimerSettings
+          disabled={
+            busy ||
+            editing ||
+            cubeOpen ||
+            !!selected ||
+            statisticsHelpOpen ||
+            sessionsOpen
+          }
+          neutralRef={timerFocusRef}
+          onOpenChange={setSettingsOpen}
+        />
+      </SessionControls>
       <main ref={timerFocusRef} tabIndex={-1}>
         <h1 className="sr-only">{t('3×3 Timer')}</h1>
         {state.history.status !== 'ready' ? (
@@ -299,9 +334,11 @@ export function TimerPage({
                       'The action could not be completed. Please try again when the timer is idle.',
                     )}
                   </p>
-                  <button onClick={() => setActionError(null)}>
-                    {t('Dismiss')}
-                  </button>
+                  <IconButton
+                    onClick={() => setActionError(null)}
+                    icon="close"
+                    label={t('Dismiss')}
+                  />
                 </div>
               )}
             </div>

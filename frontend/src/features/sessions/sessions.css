@@ -24,7 +24,7 @@
   max-width: 100%;
 }
 .timer-dialog:has(.session-manager) > header {
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 .timer-dialog:has(.session-manager) h2 {
   overflow-wrap: anywhere;
@@ -45,6 +45,9 @@
 .session-manager ul {
   list-style: none;
   padding: 0;
+}
+.session-manager {
+  margin-top: 20px;
 }
 .session-row {
   display: flex;

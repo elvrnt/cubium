@@ -1,3 +1,5 @@
+import { useTimePreferences } from '../../app/TimePreferences';
+import { IconButton } from '../shared/IconButton';
 import {
   useEffect,
   useMemo,
@@ -14,7 +16,6 @@ import {
   RESULTS_PAGE_SIZE,
 } from '../../application/results/resultsAnalysis';
 import type { ResultsPoint } from '../../application/results/resultsAnalysis';
-import { formatSolveTime } from '../../domain/solves';
 import { useLanguage } from '../../app/i18n';
 import { SiteHeader } from '../../app/SiteHeader';
 import { usePageNavigationGuard } from '../../app/usePageNavigationGuard';
@@ -38,6 +39,7 @@ export function ResultsPage({
     application.getState,
   );
   const { t, language } = useLanguage();
+  const { formatSolveTime } = useTimePreferences();
   const neutralRef = useRef<HTMLElement>(null);
   const focus = useInteractionFocus(neutralRef);
   const [params, setParams] = useSearchParams();
@@ -245,9 +247,11 @@ export function ResultsPage({
                     'The action could not be completed. Please try again when the timer is idle.',
                   )}
                 </p>
-                <button onClick={() => setActionError(null)}>
-                  {t('Dismiss')}
-                </button>
+                <IconButton
+                  onClick={() => setActionError(null)}
+                  icon="close"
+                  label={t('Dismiss')}
+                />
               </div>
             )}
             {!state.solves.length ? (
@@ -349,24 +353,26 @@ export function ResultsPage({
                     className="journal-pagination"
                     aria-label={t('Journal pages')}
                   >
-                    <button
+                    <IconButton
                       disabled={page <= 1}
                       onClick={() => change('page', String(page - 1))}
-                    >
-                      {t('Previous')}
-                    </button>
+
+                      icon="previous"
+                      label={t('Previous')}
+                    />
                     <span>
                       {t('Page')}{' '}
                       <span className="measurement">
                         {page} / {pageCount}
                       </span>
                     </span>
-                    <button
+                    <IconButton
                       disabled={page >= pageCount}
                       onClick={() => change('page', String(page + 1))}
-                    >
-                      {t('Next')}
-                    </button>
+
+                      icon="next"
+                      label={t('Next')}
+                    />
                   </nav>
                 </section>
               </>

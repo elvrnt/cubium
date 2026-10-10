@@ -1,19 +1,13 @@
+import { useTimePreferences } from '../../app/TimePreferences';
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import type { MouseEvent } from 'react';
 import type { ResultsPoint } from '../../application/results/resultsAnalysis';
 import { chartPath } from '../../application/results/resultsAnalysis';
-import { formatSolveTime, formatTimeMs } from '../../domain/solves';
 import type { AverageResult } from '../../domain/statistics';
 import { useLanguage } from '../../app/i18n';
 
 const averageTime = (value: AverageResult) =>
   value.status === 'OK' ? value.timeMs : null;
-const averageLabel = (value: AverageResult) =>
-  value.status === 'OK'
-    ? formatTimeMs(value.timeMs)
-    : value.status === 'DNF'
-      ? 'DNF'
-      : '—';
 
 export function SolveChart({
   points,
@@ -31,6 +25,13 @@ export function SolveChart({
   disabled: boolean;
 }) {
   const { t, language } = useLanguage();
+  const { formatSolveTime, formatTimeMs } = useTimePreferences();
+  const averageLabel = (value: AverageResult) =>
+    value.status === 'OK'
+      ? formatTimeMs(value.timeMs)
+      : value.status === 'DNF'
+        ? 'DNF'
+        : '—';
   const region = useRef<HTMLDivElement>(null);
   const fontProbe = useRef<HTMLSpanElement>(null);
   const [size, setSize] = useState({ width: 1000, font: 16 });

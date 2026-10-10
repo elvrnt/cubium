@@ -1,9 +1,11 @@
+import { IconButton } from '../shared/IconButton';
 import {
   useEffect,
   useLayoutEffect,
   useRef,
   useState,
   type RefObject,
+  type ReactNode,
 } from 'react';
 import type {
   TimerApplication,
@@ -22,12 +24,14 @@ export function SessionControls({
   neutralRef,
   disabled,
   onOpenChange,
+  children,
 }: {
   application: TimerApplication;
   state: TimerApplicationState;
   neutralRef: RefObject<HTMLElement | null>;
   disabled: boolean;
   onOpenChange: (open: boolean) => void;
+  children?: ReactNode;
 }) {
   const { t } = useLanguage();
   const focus = useInteractionFocus(neutralRef);
@@ -85,41 +89,45 @@ export function SessionControls({
             </span>
           </div>
           <div className="session-row__actions">
-            <button
+            <IconButton
               disabled={saving}
               onClick={() => setForm({ id: session.id, name: session.name })}
-            >
-              {t('Rename')}
-            </button>
+
+              icon="edit"
+              label={t('Rename')}
+            />
             {session.archivedAt === null ? (
-              <button
+              <IconButton
                 disabled={saving || last}
                 onClick={() =>
                   void run(() => application.archiveSession(session.id))
                 }
-              >
-                {t('Archive')}
-              </button>
+
+                icon="archive"
+                label={t('Archive')}
+              />
             ) : (
-              <button
+              <IconButton
                 disabled={saving}
                 onClick={() =>
                   void run(() => application.restoreSession(session.id))
                 }
-              >
-                {t('Restore')}
-              </button>
+
+                icon="restore"
+                label={t('Restore')}
+              />
             )}
-            <button
+            <IconButton
               className="danger"
               disabled={saving || last}
               onClick={(event) => {
                 parentRef.current = event.currentTarget.closest('dialog');
                 setDeleting(session);
               }}
-            >
-              {t('Delete')}
-            </button>
+
+              icon="delete"
+              label={t('Delete')}
+            />
           </div>
           {last && (
             <p>
@@ -177,7 +185,7 @@ export function SessionControls({
             ))}
           </select>
         </label>
-        <button
+        <IconButton
           disabled={disabled || saving}
           onPointerDown={focus.onPointerDown}
           onKeyDown={focus.onKeyDown}
@@ -185,9 +193,11 @@ export function SessionControls({
             focus.capture(event);
             setOpen(true);
           }}
-        >
-          {t('Manage sessions')}
-        </button>
+
+          icon="settings"
+          label={t('Manage sessions')}
+        />
+        {children}
       </section>
       {open && (
         <Dialog
@@ -201,12 +211,13 @@ export function SessionControls({
           }}
         >
           <div className="session-manager">
-            <button
+            <IconButton
               disabled={saving}
               onClick={() => setForm({ id: null, name: '' })}
-            >
-              {t('Create session')}
-            </button>
+
+              icon="add"
+              label={t('Create session')}
+            />
             {form && (
               <form
                 className="session-form"
@@ -236,12 +247,18 @@ export function SessionControls({
                   {t('Use 1–80 characters; spaces at the edges are removed.')}
                 </p>
                 <div>
-                  <button type="submit" disabled={saving || invalid}>
-                    {t('Save session')}
-                  </button>
-                  <button type="button" onClick={() => setForm(null)}>
-                    {t('Cancel')}
-                  </button>
+                  <IconButton
+                    type="submit"
+                    disabled={saving || invalid}
+                    icon="check"
+                    label={t('Save session')}
+                  />
+                  <IconButton
+                    type="button"
+                    onClick={() => setForm(null)}
+                    icon="close"
+                    label={t('Cancel')}
+                  />
                 </div>
               </form>
             )}
@@ -286,18 +303,22 @@ export function SessionControls({
                 )}
               </p>
               <div className="session-row__actions">
-                <button ref={cancelRef} onClick={() => setDeleting(null)}>
-                  {t('Cancel')}
-                </button>
-                <button
+                <IconButton
+                  ref={cancelRef}
+                  onClick={() => setDeleting(null)}
+                  icon="close"
+                  label={t('Cancel')}
+                />
+                <IconButton
                   className="danger"
                   disabled={saving}
                   onClick={() =>
                     void run(() => application.deleteSession(deleting.id))
                   }
-                >
-                  {t('Delete session')}
-                </button>
+
+                  icon="delete"
+                  label={t('Delete session')}
+                />
               </div>
               {state.persistence.status === 'error' && (
                 <div role="alert">

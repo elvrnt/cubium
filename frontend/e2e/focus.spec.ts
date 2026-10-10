@@ -77,6 +77,10 @@ test('Tab navigation retains native language control and cube button activation'
   await expect(
     page.getByRole('button', { name: 'Manage sessions', exact: true }),
   ).toBeFocused();
+  await page.keyboard.press('Tab'); // timer settings
+  await expect(
+    page.getByRole('button', { name: 'Timer settings' }),
+  ).toBeFocused();
   await page.keyboard.press('Tab'); // timer area
   await page.keyboard.press('Tab'); // cube
   await expect(
