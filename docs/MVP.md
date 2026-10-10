@@ -15,6 +15,7 @@ The MVP must be useful even with no backend connection.
 - 2D cube visualization;
 - keyboard timer;
 - local solve history;
+- local sessions with shared current selection, archive/restore and deletion;
 - IndexedDB persistence;
 - note;
 - +2;
@@ -212,6 +213,7 @@ type SolvePenalty = "NONE" | "PLUS_TWO" | "DNF";
 
 interface Solve {
   id: string;
+  sessionId: string;
   event: "333";
   scramble: string;
   rawTimeMs: number;
@@ -279,7 +281,8 @@ Lowest non-DNF effective solve time.
 
 ### Mean
 
-Arithmetic mean of all stored non-DNF solves. Separate sessions are not implemented.
+Arithmetic mean of the current session's non-DNF solves. Results derives its
+statistics from the selected range within that session. See [SESSIONS.md](SESSIONS.md).
 
 DNF solves are excluded from simple mean for the initial MVP unless a different metric is explicitly implemented and documented.
 

@@ -178,6 +178,10 @@ that page session select themselves. See [TIMER.md](TIMER.md#react-and-browser-a
 
 ### Local persistent state
 
+Local sessions are implemented through a shared `TrainingRepository`, database
+version 2 and the existing coordinator. Membership, selection, transactions,
+migration and page behavior are specified in [SESSIONS.md](SESSIONS.md).
+
 Examples:
 
 - solves;
@@ -193,6 +197,18 @@ language for assistive technology. Unavailable storage leaves switching usable
 in memory. This preference and history selection never enter Solve records.
 The internal IndexedDB name remains `CubeTrainerDB` after the Cubium rename,
 preserving existing data without a schema migration.
+
+### Time display preferences
+
+`TimePreferencesProvider` wraps both routes beside the language provider. Its
+presentation-only context stores running precision (0–3 decimals) and result
+precision (2 or 3) under `cubium.time-display` in localStorage. Defaults are
+hundredths while running and thousandths for results. Pure presentation
+formatters reuse effective-time penalty rules without changing the timer,
+application snapshots, statistics calculations or IndexedDB source values.
+Malformed or unavailable storage falls back safely; in-memory settings remain
+usable. The existing running frame loop only updates the selected display.
+See [UI.md](UI.md#time-display-settings) for the settings dialog and scope.
 
 ### Server state
 
@@ -214,7 +230,8 @@ coordinator and repository. Embedded/component tests use an isolated memory
 router. The language provider stays above both routes. Static hosting must serve
 `index.html` for direct product-route requests (Vite development/preview does).
 
-`TimerApplication.loadHistory()` is an idempotent, single-flight read with its
+`TimerApplication.loadHistory()` is an idempotent, single-flight snapshot read of
+sessions, current selection and all local solves with its
 existing load/error/Retry state. It does not generate scrambles or enable timing.
 `initialize()` shares this read, then starts generation only when the scramble
 is uninitialized; overlapping callers await the same initialization. Revisiting
@@ -224,7 +241,7 @@ same durable mutation methods, with no direct IndexedDB access.
 
 `application/results/resultsAnalysis.ts` purely selects dates/counts and derives
 bounded-window chart series using domain statistics and effective-time rules.
-Derived records are never stored. The responsive SVG uses paths rather than
+Derived records are never stored. The chart lower bound is the minimum numeric effective solve time in the selected range, excluding DNF. The responsive SVG uses paths rather than
 per-solve elements, while the journal renders at most 50 records. Query state is
 presentation state, not a database field. The keyboard timer adapter is mounted
 only on Timer; cleanup cancels an incomplete hold. Route blockers protect running

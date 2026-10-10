@@ -109,7 +109,9 @@ connection lifetime; the coordinator does not close shared adapters.
 
 - `timer`: the existing timer union;
 - `history`: uninitialized/loading/ready/error, with the original error on failure;
-- `solves`: immutable records ordered by instant then ID, oldest first;
+- `solves`: current-session immutable records ordered by instant then ID, oldest first;
+- `sessions`, `activeSessionId`, derived `sessionSolveCounts` and `editing`:
+  the local session contract in [SESSIONS.md](SESSIONS.md);
 - `statistics`: best, mean, ao5, ao12, ao50, ao100 composed from existing domain functions;
 - `displayedSolveId`: independent central-result identity, or null for zero;
 - `currentScramble`: immutable application scramble or null;
@@ -125,6 +127,10 @@ exceptions are logged and isolated so they cannot interrupt persistence. Stable
 `getState` and `subscribe` functions support the React `useSyncExternalStore` bridge.
 
 ### Public operations
+
+Session operations and result-editor protection extend this coordinator as
+documented in [SESSIONS.md](SESSIONS.md#repository-and-coordinator). The timer
+domain and timing API remain independent of session membership.
 
 | Method                      | Behavior                                                                                                                                                                       |
 | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |

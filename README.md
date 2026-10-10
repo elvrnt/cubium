@@ -15,7 +15,9 @@ deletion, historical details, RU/EN localization, cube enlargement and the
 Light Protocol interface with Sports Stopwatch typography and running concentration.
 The separate `/results` page adds a full editable journal, date/count filters,
 and a solve chart with optional ao5/ao12 lines. Both pages share local history.
-The backend currently exposes liveness endpoints only. Sessions, accounts,
+Local sessions separate both pages' histories, statistics and charts, with
+creation, rename, archive/restore and confirmed deletion (see `docs/SESSIONS.md`).
+The backend currently exposes liveness endpoints only. Accounts,
 synchronization and the other training tools remain future work.
 
 Future functionality is documented in `docs/ROADMAP.md`, but must not be implemented unless explicitly requested.
@@ -177,7 +179,9 @@ Frontend and backend must be independently runnable during development.
 
 The default page is a working 3×3 Timer MVP: hold Space for 300 ms, release to
 start, and press any keyboard key to stop. While running, only the timer digits
-remain visible; stop keydown immediately restores the interface. Reload restores
+remain visible; stop keydown immediately restores the interface. The Timer
+settings gear selects running precision (0–3 decimals) and result precision
+(2 or 3), remembered locally without changing saved times. Reload restores
 history and statistics while the central timer starts at `0.000`.
 Select any recent solve to inspect its original scramble and local creation date/time,
 edit +2/DNF, add a note (up to 300 UTF-16 code units), or delete it.

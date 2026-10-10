@@ -19,6 +19,10 @@ Avoid generic dashboard cards surrounding every element.
 
 ### Implemented Timer MVP
 
+Both pages include the shared local session selector and management dialog below
+the header. Behavior, focus, archive/deletion and filter reset are specified in
+[SESSIONS.md](SESSIONS.md#interface-and-navigation).
+
 The default `/` page uses the Light Protocol design: warm white, ink text and
 cobalt selection/focus (tokens in [DESIGN.md](../DESIGN.md)). Scramble text sits
 above the dominant timer, with a compact six-value statistics column on its left
@@ -81,9 +85,7 @@ time, DNF, or an em dash. Scramble/cube input comes only from currentScramble.
 Fresh opening/reload restores history and statistics but starts the central timer
 at 0.000, without selecting a historical result. A completion during this page
 session selects its own result. The idle readout retains that independently tracked result. Deleting it
-shows 0.000 even when older history remains, and hides the result caption and
-action buttons. There is no first-solve hint under the timer. Compact actions identify their target
-by its formatted result. +2 and DNF buttons toggle to NONE when
+shows 0.000 even when older history remains, and hides the action buttons. There is no first-solve hint under the timer. The central digits identify the current result; the actions do not duplicate its time. +2 and DNF buttons toggle to NONE when
 already selected, or select that single penalty otherwise.
 
 The compact native note dialog loads the current note, preserves text exactly,
@@ -220,12 +222,15 @@ Do not rely exclusively on color; subtle text/icon/state changes are acceptable.
 
 ### Running
 
-Only the timer digits remain visible; the state instruction remains accessible
+Only the timer digits remain visible, at the chosen running precision (0–3
+decimal places; hundredths by default). Lower precision drops fractional digits
+for display only, without changing measurement or stored precision. The state instruction remains accessible
 to screen readers. All other controls are inert until stop keydown.
 
 ### Stopped
 
-Show exact final time and result controls.
+Show the final time at the selected result precision (hundredths or thousandths)
+and result controls. Full measured precision remains stored.
 
 ## Scramble
 
@@ -288,7 +293,13 @@ DNF
 Delete
 ```
 
-Buttons should remain visually secondary to timer.
+Buttons remain visually secondary to the timer. Obvious actions use a shared
+20px stroke SVG family: close/cancel (cross), note (page), delete (trash),
+save (check), create (plus), rename (pencil), archive (box), restore (return
+arrow), management (sliders), and journal pagination (chevrons). +2 and DNF
+remain text. Icon buttons retain localized aria-label and title, native keyboard
+activation, visible focus and at least 44×44px targets. Confirmations still
+identify the solve/session in their dialog content; recovery actions keep text.
 
 ## Note editor
 
@@ -326,8 +337,9 @@ Reset returns to defaults; refresh and Back/Forward restore URL selections.
 Statistics and rolling averages use only the selected records, including
 existing +2/DNF semantics. Early average points have insufficient data, not
 context borrowed from outside the selected range. The X axis uses full-history
-chronological ordinals (instant then ID); the Y axis begins at zero and includes
-all values. Effective solve time is a muted line, ao5 cobalt and ao12 dashed
+chronological ordinals (instant then ID); the Y axis begins at the minimum numeric effective solve time in the selected
+range and includes all values. DNF is excluded from this minimum; equal times
+receive a positive vertical span. Keyboard instructions are screen-reader-only. Effective solve time is a muted line, ao5 cobalt and ao12 dashed
 green. DNF markers occupy a labelled separate band and break numeric paths.
 DNF/insufficient averages have no numeric point. Outliers are never hidden.
 
@@ -347,7 +359,8 @@ neutral main; deleted openers fall back there. Results has no timer shortcuts.
 At small widths filters stack, statistics wrap, and journal rows reflow to time,
 date and Details; full notes and ordinals remain available in the details/chart.
 Loading, read errors, empty history, no matching filters and all-DNF selections
-have distinct text and recovery actions. No sessions or new source fields exist.
+have distinct text and recovery actions. All data belongs to the shared current
+session; see [SESSIONS.md](SESSIONS.md).
 
 Do not waste significant implementation time creating unfinished pages.
 
@@ -374,3 +387,25 @@ Provide:
 - appropriate aria labels where needed;
 - sufficient contrast;
 - keyboard reachable actions.
+
+## Time display settings
+
+A gear button beside session management opens the compact Timer settings dialog.
+While running offers whole seconds, tenths, hundredths and thousandths with
+examples; Results offers only hundredths and thousandths. Changes apply
+immediately and persist in `cubium.time-display` localStorage. Defaults are
+hundredths while running and thousandths for results. Malformed preferences
+fall back to defaults; unavailable storage does not prevent in-memory changes.
+
+Result precision applies consistently to the resting timer, history, statistics,
+result dialogs, announcements, Results journal and chart inspector. Graph
+geometry and all calculations still use full source values. Precision below
+three decimals truncates dropped digits without rounding up; thousandths retain
+the existing nearest-millisecond formatter. Time, penalties and notes in
+IndexedDB are never rewritten by display settings.
+
+Native selects retain arrows/Space, and the dialog retains Tab/Escape and
+pointer/keyboard focus restoration. Settings are unavailable while holding,
+ready, running, pending writes or another editor/dialog is open. While settings
+are open, timer shortcuts and route changes are suspended. The gear is hidden
+and inert with the rest of the interface during concentration.

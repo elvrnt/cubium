@@ -206,6 +206,13 @@ The language selector uses the page surface, stronger control stroke and control
 
 Cubium, Timer and Results share a ruled header. The brand uses compact Golos Text (1.25rem, 600) and the cobalt cube-grid mark. The active page link uses cobalt text and an underline; the language control sits at the end. Compact headers wrap rather than forcing horizontal overflow.
 
+The shared session row follows the header: a labelled native selector and a
+secondary management button. It wraps on narrow screens and retains the Light
+Protocol control strokes, 44px targets and cobalt focus. Timer measures its height
+as part of the top chrome and hides it during concentration. Session management
+uses the existing raised-paper modal; flat divided rows show names, derived solve
+counts and actions, with archive separated by a heading. See `docs/SESSIONS.md`.
+
 ### Statistics / Recent Results
 
 Timer statistics form a quiet left column on desktop, with six label/value rows and right-aligned measurements. Flowing Timer layouts and the Results page retain a ruled statistics strip. Names are muted and Cubium Golos Numeric results use lining, tabular numerals with no kerning. Best receives the cobalt accent. Help is a compact raised-paper region with the stronger stroke. Recent results are real buttons in a wrapping horizontal list, preserving numeric formatting, explicit penalty notation and selection styling.
@@ -261,3 +268,14 @@ There is no transition into concentration. Scrolling locks during Running and re
 - **Don't** add animated movement to concentration or a second timer frame loop.
 - **Don't** use the fine divider token as the stronger interactive-control boundary.
 - **Don't** turn development-only component examples or unused legacy styles into product rules.
+
+## Compact action icons and running precision
+
+Obvious actions use one authored 20px, 1.5px-stroke SVG family in 44×44px
+buttons, with localized accessible names and hover titles. +2 and DNF keep
+text labels; recovery actions retain explanatory text. The current result is
+shown once in the central digits, with actions beneath. A gear opens compact display settings with labelled native selects and numeric
+examples. Running precision is independently selectable from whole seconds to
+thousandths (default hundredths); results use hundredths or thousandths (default
+thousandths). Lower precision drops digits without rounding up.
+Measurement, statistics and persisted precision are unchanged.

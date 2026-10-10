@@ -62,7 +62,7 @@ Algorithms
 Profile
 ```
 
-MVP implements only the Timer page.
+The implemented pages are Timer and Results, with shared local sessions.
 
 Other routes may exist only as disabled or clearly marked placeholders if explicitly requested.
 
@@ -83,11 +83,9 @@ navigation
 
 scramble
 
-                timer                  cube visualization
+statistics      timer                  cube visualization
 
 timer actions
-
-horizontal statistics
 
 recent solves
 ```
@@ -118,8 +116,8 @@ Use `cubing.js` where practical.
 
 ### Statistics
 
-Statistics appear in a compact horizontal strip below the timer on desktop,
-reflowing into rows on compact screens.
+Statistics appear in a compact column left of the timer on desktop, following
+the timer and cube on compact screens. They describe the current session.
 
 Initial statistics:
 
@@ -167,8 +165,8 @@ English with a locally remembered language choice; see [UI.md](UI.md).
 The requested `/results` extension exposes the full local journal with editing
 and a solve chart, while Timer retains its latest 20. Count/date selection,
 selected-range averages, DNF presentation and keyboard interaction are specified
-in [UI.md](UI.md#results-page). It uses the existing collection, without sessions,
-accounts, synchronization or changes to stored Solve records.
+in [UI.md](UI.md#results-page). It uses the shared current local session, without
+accounts or synchronization. Session behavior is specified in [SESSIONS.md](SESSIONS.md).
 
 ## Future BLD functionality
 

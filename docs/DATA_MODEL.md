@@ -29,6 +29,7 @@ and retains failed mutations in memory for explicit retry.
 Solve
 
 id              string (client-generated UUID in production)
+sessionId       string (owning local session UUID)
 event           "333"
 scramble        string
 rawTimeMs       non-negative integer milliseconds
@@ -47,16 +48,19 @@ DNF
 
 ### IndexedDB persistence
 
-The database is named `CubeTrainerDB`. Its initial Dexie version is **1**, with
-one store and the schema declaration:
+The database is named `CubeTrainerDB`. Its current Dexie version is **2**:
 
 ```ts
-database.version(1).stores({ solves: "id, createdAt, event" });
+database.version(2).stores({
+  solves: "id, createdAt, event, sessionId",
+  sessions: "id, createdAt",
+  settings: "key",
+});
 ```
 
 Cubium deliberately keeps `CubeTrainerDB` as an internal compatibility identifier.
-The product rename leaves the database, version and records unchanged; no migration
-or deletion is performed. Language preferences use localStorage; selected history
+The product rename itself did not alter storage. The sessions extension migrates
+v1 data atomically into “Основная”; see [SESSIONS.md](SESSIONS.md). Language preferences use localStorage; selected history
 and displayed-result identity are transient and do not add persistent fields.
 On reload the displayed-result identity starts null even when history exists.
 `createdAt` is formatted as local date/time for RU/EN only in the UI; formatted
@@ -66,10 +70,10 @@ New note edits are validated in the application/domain contract against
 records are not rewritten or truncated when loaded.
 
 `id` is the unique, non-auto-incrementing primary key supplied by the caller.
-`createdAt` and `event` are non-unique secondary indexes for chronological and
-event-based queries. No compound or speculative indexes are defined. The store
+`createdAt`, `event` and `sessionId` are non-unique secondary indexes. No compound
+or speculative indexes are defined. The store
 contains the existing domain `Solve` with camelCase field names, including
-`rawTimeMs` and `createdAt`. Only its seven source fields are written; additional
+`rawTimeMs`, `createdAt` and `sessionId`. Only its eight source fields are written; additional
 properties such as effective times or statistics are excluded.
 
 The public API is exported from `frontend/src/infrastructure/persistence/index.ts`:
@@ -81,8 +85,9 @@ const repository = createSolveRepository(); // CubeTrainerDB by default
 The factory accepts an optional database name for isolated tests. It opens the
 browser's real IndexedDB lazily on the first operation; importing the module has
 no database side effects. Consumers use `SolveRepository`, which exposes no
-Dexie types or tables. The internal schema definition is in `database.ts`, where
-future Dexie versions can be added when required.
+Dexie types or tables. The returned `TrainingRepository` extends the solve
+operations with snapshot loading and transactional session mutations, specified
+in [SESSIONS.md](SESSIONS.md#repository-and-coordinator).
 
 | Method          | Contract                                                                                                                        |
 | --------------- | ------------------------------------------------------------------------------------------------------------------------------- |

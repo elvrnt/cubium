@@ -7,6 +7,11 @@ values and must not be persisted.
 
 ## Solve API
 
+`Solve.sessionId` identifies the owning local session; penalty/note operations
+preserve it. The independent `domain/sessions` module exports `Session`,
+`MAX_SESSION_NAME_LENGTH`, `normalizeSessionName` and deterministic `orderSessions`.
+Their persistence and application contract is specified in [SESSIONS.md](SESSIONS.md).
+
 Import from `frontend/src/domain/solves/index.ts`:
 
 - `Solve` and `SolvePenalty`: the MVP model from `MVP.md`, with camelCase fields.
@@ -50,9 +55,9 @@ The `AverageResult` discriminated union distinguishes all three average states:
 
 ```ts
 type AverageResult =
-  | { status: 'OK'; timeMs: number }
-  | { status: 'DNF' }
-  | { status: 'INSUFFICIENT_DATA' };
+  | { status: "OK"; timeMs: number }
+  | { status: "DNF" }
+  | { status: "INSUFFICIENT_DATA" };
 ```
 
 Not enough solves always yields `INSUFFICIENT_DATA`, even if all available solves

@@ -10,12 +10,14 @@ Phase 0 and the core Phase 1 Timer MVP are implemented. The Timer also includes
 historical solve details, RU/EN localization, compact note/delete dialogs,
 local creation date/time and Running concentration. Current behavior is documented
 in [MVP.md](MVP.md), [UI.md](UI.md) and [TIMER.md](TIMER.md).
-Sessions and Phases 2 onward remain future work; items already shipped are not
+Phase 2 local sessions are implemented; Phases 3 onward remain future work.
+Items already shipped are not
 requirements to reimplement.
 
 The requested Results extension is also implemented: `/results` provides the
 full editable local journal, count/date filters and a solve chart with ao5/ao12.
-It shares the Timer collection and does not implement sessions or synchronization.
+It shares Timer's current session. Local session behavior is documented in
+[SESSIONS.md](SESSIONS.md); synchronization remains future work.
 
 # Phase 0 — Repository foundation
 
@@ -60,6 +62,9 @@ Deliverables:
 - E2E timer test.
 
 # Phase 2 — Sessions
+
+Implemented locally, including archive restoration and safe migration of the
+existing history. See [SESSIONS.md](SESSIONS.md).
 
 Goal:
 
