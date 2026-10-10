@@ -12,10 +12,17 @@ async function seed(page: Page, solves: Solve[]) {
       request.onerror = () => reject(request.error);
     });
     await new Promise<void>((resolve, reject) => {
-      const tx = db.transaction('solves', 'readwrite');
+      const tx = db.transaction(['solves', 'settings'], 'readwrite');
       const store = tx.objectStore('solves');
       store.clear();
-      records.forEach((record) => store.put(record));
+      const active = tx.objectStore('settings').get('activeSessionId');
+      active.onsuccess = () =>
+        records.forEach((record) =>
+          store.put({
+            ...record,
+            sessionId: (active.result as { value: string }).value,
+          }),
+        );
       tx.oncomplete = () => resolve();
       tx.onerror = () => reject(tx.error);
       tx.onabort = () => reject(tx.error);

@@ -15,10 +15,14 @@ export function useTimerPresentation(ready: boolean, running: boolean) {
     const center = centerRef.current;
     const workspace = page?.querySelector<HTMLElement>('.timer-workspace');
     const statistics = page?.querySelector<HTMLElement>('.timer-statistics');
+    const sessionControls =
+      page?.querySelector<HTMLElement>('.session-controls');
     if (!page || !header || !scramble || !center || !workspace || !statistics)
       return;
     const measure = () => {
-      const headerHeight = header.getBoundingClientRect().height;
+      const headerHeight =
+        header.getBoundingClientRect().height +
+        (sessionControls?.getBoundingClientRect().height ?? 0);
       const scrambleHeight = scramble.getBoundingClientRect().height;
       const valueHeight =
         center.querySelector('[role="timer"]')?.getBoundingClientRect()
@@ -50,6 +54,7 @@ export function useTimerPresentation(ready: boolean, running: boolean) {
     measure();
     const observer = new ResizeObserver(measure);
     observer.observe(header);
+    if (sessionControls) observer.observe(sessionControls);
     observer.observe(scramble);
     observer.observe(center);
     observer.observe(workspace);

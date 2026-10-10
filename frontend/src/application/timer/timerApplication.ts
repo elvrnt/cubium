@@ -11,6 +11,11 @@ import {
   transitionTimer,
 } from '../../domain/timer';
 import type { TimerEvent } from '../../domain/timer';
+import { normalizeSessionName } from '../../domain/sessions';
+import type {
+  SessionMutation,
+  TrainingSnapshot,
+} from '../../infrastructure/persistence/trainingRepository';
 import { SolveNotFoundError } from '../../infrastructure/persistence/solveRepository';
 import type {
   PendingMutation,
@@ -20,10 +25,15 @@ import type {
 
 /** One local timer use case. Injected adapters are owned and closed by the caller. */
 export class TimerApplication {
+  private allSolves: readonly Readonly<Solve>[] = [];
   private historyLoad: Promise<void> | null = null;
   private initialization: Promise<void> | null = null;
   private readonly listeners = new Set<() => void>();
   private state: TimerApplicationState = Object.freeze({
+    sessions: Object.freeze([]),
+    activeSessionId: null,
+    sessionSolveCounts: Object.freeze({}),
+    editing: false,
     timer: Object.freeze(createInitialTimerState()),
     history: Object.freeze({ status: 'uninitialized' }),
     currentScramble: null,
@@ -61,6 +71,7 @@ export class TimerApplication {
       next.scramble.status === 'ready' &&
       next.currentScramble !== null &&
       next.persistence.status === 'idle';
+    next.canArm = next.canArm && next.activeSessionId !== null && !next.editing;
     this.state = Object.freeze({
       ...next,
       timer: Object.freeze(next.timer),
@@ -85,7 +96,114 @@ export class TimerApplication {
         .map((solve) => Object.freeze({ ...solve }))
         .sort(compareSolvesChronologically),
     );
-    return { solves: ordered, statistics: calculateStatistics(ordered) };
+    this.allSolves = ordered;
+    const current = Object.freeze(
+      ordered.filter((solve) => solve.sessionId === this.state.activeSessionId),
+    );
+    const counts: Record<string, number> = {};
+    for (const solve of ordered)
+      counts[solve.sessionId] = (counts[solve.sessionId] ?? 0) + 1;
+    return {
+      solves: current,
+      statistics: calculateStatistics(current),
+      sessionSolveCounts: Object.freeze(counts),
+    };
+  }
+
+  private acceptSnapshot(snapshot: TrainingSnapshot, reset = false) {
+    // Set the selection before deriving its collection, with one notification.
+    const switched = snapshot.activeSessionId !== this.state.activeSessionId;
+    this.state = Object.freeze({
+      ...this.state,
+      activeSessionId: snapshot.activeSessionId,
+    });
+    const timer =
+      switched && this.state.timer.status === 'stopped'
+        ? transitionTimer(this.state.timer, {
+            type: 'STOP_KEY_UP',
+            now: this.dependencies.timerClock.now(),
+          }).state
+        : this.state.timer;
+    this.publish({
+      ...this.collection(snapshot.solves),
+      sessions: Object.freeze(
+        snapshot.sessions.map((session) => Object.freeze({ ...session })),
+      ),
+      history: { status: 'ready' },
+      persistence: { status: 'idle' },
+      timer,
+      displayedSolveId: switched || reset ? null : this.state.displayedSolveId,
+    });
+  }
+
+  setEditingBlocked(editing: boolean): void {
+    if (this.state.editing !== editing) this.publish({ editing });
+  }
+
+  private async sessionMutation(mutation: SessionMutation): Promise<void> {
+    this.requireEditable();
+    if (this.state.editing) throw new Error('Close the result editor first');
+    if (mutation.type !== 'create') {
+      const session = this.state.sessions.find(
+        (item) => item.id === mutation.id,
+      );
+      if (!session) throw new Error('Session not found');
+      if (mutation.type === 'select' && session.archivedAt !== null)
+        throw new Error('Restore the archived session first');
+      if (
+        (mutation.type === 'archive' || mutation.type === 'delete') &&
+        session.archivedAt === null &&
+        this.state.sessions.filter((item) => item.archivedAt === null)
+          .length === 1
+      )
+        throw new Error('Keep at least one active session');
+    }
+    const retained =
+      mutation.type === 'create'
+        ? { ...mutation, session: Object.freeze({ ...mutation.session }) }
+        : mutation;
+    const pending = Object.freeze({
+      type: 'session' as const,
+      mutation: Object.freeze(retained),
+    });
+    this.publish({ persistence: { status: 'saving', pending } });
+    await this.persist(pending);
+  }
+  createSession(name: string): Promise<void> {
+    return this.sessionMutation({
+      type: 'create',
+      session: {
+        id: this.dependencies.idGenerator.generate(),
+        name: normalizeSessionName(name),
+        event: '333',
+        createdAt: this.dependencies.dateProvider.nowIso(),
+        archivedAt: null,
+      },
+    });
+  }
+  renameSession(id: string, name: string): Promise<void> {
+    return this.sessionMutation({
+      type: 'rename',
+      id,
+      name: normalizeSessionName(name),
+    });
+  }
+  selectSession(id: string): Promise<void> {
+    if (id === this.state.activeSessionId) return Promise.resolve();
+    return this.sessionMutation({ type: 'select', id });
+  }
+  archiveSession(id: string): Promise<void> {
+    return this.sessionMutation({
+      type: 'archive',
+      id,
+      archivedAt: this.dependencies.dateProvider.nowIso(),
+    });
+  }
+  restoreSession(id: string): Promise<void> {
+    return this.sessionMutation({ type: 'restore', id });
+  }
+  deleteSession(id: string): Promise<void> {
+    return this.sessionMutation({ type: 'delete', id });
   }
 
   /** Shared single-flight read. Results can load history without a scramble. */
@@ -103,18 +221,14 @@ export class TimerApplication {
   }
 
   private async readHistory(): Promise<void> {
-    let solves: Solve[];
+    let snapshot: TrainingSnapshot;
     try {
-      solves = await this.dependencies.solveRepository.getAll();
+      snapshot = await this.dependencies.solveRepository.loadSnapshot();
     } catch (error) {
       this.publish({ history: { status: 'error', error } });
       return;
     }
-    this.publish({
-      ...this.collection(solves),
-      history: { status: 'ready' },
-      displayedSolveId: null,
-    });
+    this.acceptSnapshot(snapshot, true);
   }
 
   /** Idempotent startup; a successful Results read needs only scramble startup. */
@@ -172,6 +286,7 @@ export class TimerApplication {
     const scramble = this.state.currentScramble!;
     const solve: Readonly<Solve> = Object.freeze({
       id: this.dependencies.idGenerator.generate(),
+      sessionId: this.state.activeSessionId!,
       event: '333',
       scramble: scramble.notation,
       rawTimeMs: Math.round(result.effect.elapsedMs),
@@ -242,6 +357,9 @@ export class TimerApplication {
     const repository = this.dependencies.solveRepository;
     try {
       switch (pending.type) {
+        case 'session':
+          this.acceptSnapshot(await repository.mutateSession(pending.mutation));
+          return;
         case 'save':
           await repository.save(pending.solve);
           break;
@@ -258,11 +376,9 @@ export class TimerApplication {
     }
     const solves =
       pending.type === 'delete'
-        ? this.state.solves.filter((solve) => solve.id !== pending.solveId)
+        ? this.allSolves.filter((solve) => solve.id !== pending.solveId)
         : [
-            ...this.state.solves.filter(
-              (solve) => solve.id !== pending.solve.id,
-            ),
+            ...this.allSolves.filter((solve) => solve.id !== pending.solve.id),
             pending.solve,
           ];
     if (pending.type === 'save') {

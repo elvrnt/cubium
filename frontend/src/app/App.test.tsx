@@ -104,7 +104,9 @@ describe('Timer page', () => {
     await waitFor(() =>
       expect(screen.queryByRole('textbox')).not.toBeInTheDocument(),
     );
-    expect(screen.getByRole('button', { name: 'Note' })).toHaveFocus();
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Note' })).toHaveFocus(),
+    );
     expect(fixture.records.get(solve.id)?.note).toBe('new note with spaces');
     fireEvent.click(screen.getByRole('button', { name: 'Note' }));
     fireEvent.change(screen.getByRole('textbox'), {

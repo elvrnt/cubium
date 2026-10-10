@@ -2,6 +2,29 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 
 const russian = {
+  Session: 'Сессия',
+  'Manage sessions': 'Управление сессиями',
+  'Create session': 'Создать сессию',
+  'Session name': 'Название сессии',
+  'Save session': 'Сохранить сессию',
+  'Archived sessions': 'Архив сессий',
+  Rename: 'Переименовать',
+  Archive: 'В архив',
+  Restore: 'Восстановить',
+  Current: 'Текущая',
+  Solves: 'Сборок',
+  'Delete session?': 'Удалить сессию?',
+  'Delete session': 'Удалить сессию',
+  'The session and all its solves will be permanently deleted.':
+    'Сессия и все её сборки будут удалены безвозвратно.',
+  'Create another session before archiving or deleting this one.':
+    'Сначала создайте другую сессию, чтобы архивировать или удалить эту.',
+  'Use 1–80 characters; spaces at the edges are removed.':
+    'От 1 до 80 символов; пробелы по краям удаляются.',
+  'Could not change the session. Please try again.':
+    'Не удалось изменить сессию. Повторите попытку.',
+  'Close another Cubium tab to finish updating the database.':
+    'Закройте другую вкладку Cubium, чтобы завершить обновление базы.',
   Results: 'Результаты',
   'Page not found': 'Страница не найдена',
   Showing: 'Показано',

@@ -148,7 +148,7 @@ it.each(['en', 'ru'] as const)(
         name: language === 'ru' ? 'Последние 20' : 'Last 20',
       }),
     ).toBeVisible();
-    act(() => screen.getByRole('combobox').focus());
+    act(() => screen.getByRole('combobox', { name: /Language|Язык/ }).focus());
     expect(screen.getByRole('timer').parentElement).toHaveTextContent(
       language === 'ru' ? 'Вернитесь к таймеру' : 'Click the timer',
     );

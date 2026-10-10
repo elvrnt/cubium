@@ -160,7 +160,9 @@ test('historical details use local RU/EN time and deleting old result preserves 
   await solve(page);
   const current = await page.getByRole('timer').innerText();
   for (const language of ['en', 'ru']) {
-    await page.getByRole('combobox').selectOption(language);
+    await page
+      .getByRole('combobox', { name: /Language|Язык/ })
+      .selectOption(language);
     await page.getByTestId('recent-solve').nth(1).getByRole('button').click();
     const dialog = page.getByRole('dialog');
     const timestamp = await dialog.locator('time').getAttribute('datetime');
@@ -175,7 +177,9 @@ test('historical details use local RU/EN time and deleting old result preserves 
     await expect(dialog.locator('time')).toHaveText(expected);
     await page.keyboard.press('Escape');
   }
-  await page.getByRole('combobox').selectOption('en');
+  await page
+    .getByRole('combobox', { name: /Language|Язык/ })
+    .selectOption('en');
   await page.getByTestId('recent-solve').nth(1).getByRole('button').click();
   await page
     .getByRole('dialog')

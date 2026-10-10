@@ -20,6 +20,8 @@ import { SolveDetails } from './SolveDetails';
 import { SiteHeader } from '../../app/SiteHeader';
 import { usePageNavigationGuard } from '../../app/usePageNavigationGuard';
 import './timer.css';
+import { SessionControls } from '../sessions/SessionControls';
+import { DatabaseBlockedError } from '../../infrastructure/persistence';
 
 export function TimerPage({
   application,
@@ -59,12 +61,28 @@ export function TimerPage({
     [application],
   );
   const [editing, setEditing] = useState(false);
-  usePageNavigationGuard(running || editing || cubeOpen || !!selected);
+  const [sessionsOpen, setSessionsOpen] = useState(false);
+  usePageNavigationGuard(
+    running || editing || cubeOpen || !!selected || sessionsOpen,
+  );
+  useEffect(() => {
+    application.setEditingBlocked(editing || !!selected);
+    return () => application.setEditingBlocked(false);
+  }, [application, editing, selected]);
   const [actionError, setActionError] = useState<unknown>(null);
   useEffect(() => {
-    if (editing || cubeOpen || selected || statisticsHelpOpen) return;
+    if (editing || cubeOpen || selected || statisticsHelpOpen || sessionsOpen)
+      return;
     return attachTimerKeyboard(application, clock, setActionError);
-  }, [application, clock, editing, cubeOpen, selected, statisticsHelpOpen]);
+  }, [
+    application,
+    clock,
+    editing,
+    cubeOpen,
+    selected,
+    statisticsHelpOpen,
+    sessionsOpen,
+  ]);
   const displayed = state.solves.find(
     (solve) => solve.id === state.displayedSolveId,
   );
@@ -95,12 +113,28 @@ export function TimerPage({
         headerRef={headerRef}
         running={running}
       />
+      <SessionControls
+        application={application}
+        state={state}
+        neutralRef={timerFocusRef}
+        disabled={
+          busy || editing || cubeOpen || !!selected || statisticsHelpOpen
+        }
+        onOpenChange={setSessionsOpen}
+      />
       <main ref={timerFocusRef} tabIndex={-1}>
         <h1 className="sr-only">{t('3×3 Timer')}</h1>
         {state.history.status !== 'ready' ? (
           <section className="startup" aria-label={t('Startup')}>
             {state.history.status === 'error' ? (
               <div role="alert">
+                {state.history.error instanceof DatabaseBlockedError && (
+                  <p>
+                    {t(
+                      'Close another Cubium tab to finish updating the database.',
+                    )}
+                  </p>
+                )}
                 <h2>{t('Could not load solve history')}</h2>
                 <p>
                   {t(
@@ -241,22 +275,23 @@ export function TimerPage({
               {state.persistence.status === 'saving' && (
                 <p role="status">{t('Saving on this device…')}</p>
               )}
-              {state.persistence.status === 'error' && (
-                <div className="error-notice" role="alert">
-                  <p>
-                    {t(
-                      'Could not save your change. It is still held in memory. Retry before closing this page.',
-                    )}
-                  </p>
-                  <button
-                    onClick={() => {
-                      void application.retryPersistence();
-                    }}
-                  >
-                    {t('Retry save')}
-                  </button>
-                </div>
-              )}
+              {state.persistence.status === 'error' &&
+                state.persistence.pending.type !== 'session' && (
+                  <div className="error-notice" role="alert">
+                    <p>
+                      {t(
+                        'Could not save your change. It is still held in memory. Retry before closing this page.',
+                      )}
+                    </p>
+                    <button
+                      onClick={() => {
+                        void application.retryPersistence();
+                      }}
+                    >
+                      {t('Retry save')}
+                    </button>
+                  </div>
+                )}
               {actionError !== null && (
                 <div className="error-notice" role="alert">
                   <p>

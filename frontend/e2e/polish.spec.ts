@@ -9,7 +9,9 @@ async function ready(page: Page) {
 }
 async function openEnglish(page: Page) {
   await page.goto('/');
-  await page.getByRole('combobox').selectOption('en');
+  await page
+    .getByRole('combobox', { name: /Language|Язык/ })
+    .selectOption('en');
   await ready(page);
 }
 
@@ -54,7 +56,9 @@ test('Russian default, both switches and language preference survive reload', as
   await expect(page.getByRole('combobox', { name: 'Язык' })).toHaveValue('ru');
   await expect(page.getByTestId('scramble')).toBeVisible({ timeout: 20000 });
   const scramble = await page.getByTestId('scramble').innerText();
-  await page.getByRole('combobox').selectOption('en');
+  await page
+    .getByRole('combobox', { name: /Language|Язык/ })
+    .selectOption('en');
   await expect(page.getByRole('heading', { name: 'Statistics' })).toBeVisible();
   await expect(page.getByTestId('scramble')).toHaveText(scramble);
   await page.reload();
@@ -62,7 +66,9 @@ test('Russian default, both switches and language preference survive reload', as
   await expect(page.getByRole('combobox', { name: 'Language' })).toHaveValue(
     'en',
   );
-  await page.getByRole('combobox').selectOption('ru');
+  await page
+    .getByRole('combobox', { name: /Language|Язык/ })
+    .selectOption('ru');
   await expect(page.getByRole('heading', { name: 'Статистика' })).toBeVisible();
   await page.reload();
   await expect(page.getByRole('combobox', { name: 'Язык' })).toHaveValue('ru');

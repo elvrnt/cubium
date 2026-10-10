@@ -46,7 +46,9 @@ it('defaults to Russian, brands Cubium and switches both ways without changing n
   view.unmount();
   render(<App {...fixture} />);
   expect(screen.getByRole('combobox', { name: 'Language' })).toHaveValue('en');
-  fireEvent.change(screen.getByRole('combobox'), { target: { value: 'ru' } });
+  fireEvent.change(screen.getByRole('combobox', { name: /Language|Язык/ }), {
+    target: { value: 'ru' },
+  });
   expect(screen.getByText('Статистика')).toBeVisible();
   expect(document.documentElement.lang).toBe('ru');
 });
@@ -72,7 +74,7 @@ it('returns pointer language selection to the timer while preserving keyboard se
   const fixture = timerApplicationFixture();
   render(<App {...fixture} />);
   await screen.findByText('R U2');
-  const language = screen.getByRole('combobox');
+  const language = screen.getByRole('combobox', { name: /Language|Язык/ });
   language.focus();
   fireEvent.pointerDown(language);
   fireEvent.change(language, { target: { value: 'en' } });

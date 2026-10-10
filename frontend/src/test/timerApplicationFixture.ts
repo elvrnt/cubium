@@ -2,10 +2,11 @@ import { vi } from 'vitest';
 import { TimerApplication } from '../application/timer';
 import type { Solve } from '../domain/solves';
 import type { Scramble } from '../domain/scramble';
+import { withSessions } from './trainingRepositoryFixture';
 
 export function timerApplicationFixture(solves: Solve[] = []) {
   const records = new Map(solves.map((solve) => [solve.id, { ...solve }]));
-  const repository = {
+  const repository = withSessions({
     getAll: vi.fn(async () => [...records.values()]),
     getById: vi.fn(async (id: string) => records.get(id)),
     save: vi.fn(async (solve: Readonly<Solve>) => {
@@ -21,7 +22,7 @@ export function timerApplicationFixture(solves: Solve[] = []) {
       records.clear();
     }),
     close: vi.fn(),
-  };
+  });
   const generator = {
     generate333: vi
       .fn<() => Promise<Scramble>>()

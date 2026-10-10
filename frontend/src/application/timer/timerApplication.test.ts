@@ -13,12 +13,14 @@ import type { Scramble } from '../../domain/scramble';
 import type { SolveRepository } from '../../infrastructure/persistence/solveRepository';
 import { SolveNotFoundError } from '../../infrastructure/persistence/solveRepository';
 import { TimerApplication } from './index';
+import { withSessions } from '../../test/trainingRepositoryFixture';
 
 const A: Scramble = { event: '333', notation: "R U R'" };
 const B: Scramble = { event: '333', notation: 'F2 U2' };
 const date = '2026-10-06T10:00:00.000Z';
 const old: Solve = {
   id: 'old',
+  sessionId: 'test-main-session',
   event: '333',
   scramble: 'U',
   rawTimeMs: 10000,
@@ -39,7 +41,7 @@ function deferred<T>() {
 
 function setup(initial: Solve[] = []) {
   const records = new Map(initial.map((solve) => [solve.id, { ...solve }]));
-  const repository = {
+  const repository = withSessions({
     getAll: vi.fn(async () =>
       [...records.values()].map((solve) => ({ ...solve })),
     ),
@@ -59,7 +61,7 @@ function setup(initial: Solve[] = []) {
       records.clear();
     }),
     close: vi.fn(),
-  } satisfies SolveRepository;
+  } satisfies SolveRepository);
   const scrambleGenerator = {
     generate333: vi
       .fn<() => Promise<Scramble>>()
@@ -241,6 +243,7 @@ describe('completed solve lifecycle', () => {
     const completion = stop(app);
     const expected: Solve = {
       id: 'solve-1',
+      sessionId: 'test-main-session',
       event: '333',
       scramble: A.notation,
       rawTimeMs: 12483,

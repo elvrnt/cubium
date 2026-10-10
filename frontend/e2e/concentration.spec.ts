@@ -127,7 +127,7 @@ test('running hides all chrome, retains its DOM, keeps neutral focus and restore
   page,
 }) => {
   await page
-    .getByRole('combobox')
+    .getByRole('combobox', { name: /Language|Язык/ })
     .evaluate((element) => element.setAttribute('data-preserved', 'yes'));
   await start(page);
   await expect(page.getByRole('timer')).toBeVisible();
@@ -157,10 +157,9 @@ test('running hides all chrome, retains its DOM, keeps neutral focus and restore
   await page.keyboard.down('Tab'); // browser repeat must not save a second solve
   await page.keyboard.up('Tab');
   await expect(page.getByTestId('recent-solve')).toHaveCount(1);
-  await expect(page.getByRole('combobox')).toHaveAttribute(
-    'data-preserved',
-    'yes',
-  );
+  await expect(
+    page.getByRole('combobox', { name: /Language|Язык/ }),
+  ).toHaveAttribute('data-preserved', 'yes');
 });
 
 for (const [width, height] of [

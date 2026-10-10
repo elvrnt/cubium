@@ -5,7 +5,11 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { setSolvePenalty } from '../../domain/solves';
 import type { SolvePenalty } from '../../domain/solves';
 import { calculateAo5 } from '../../domain/statistics';
-import { makeSolve, makeSolves } from '../../test/solveFixtures';
+import {
+  makeSolve as makeFixtureSolve,
+  makeSolves as makeFixtureSolves,
+} from '../../test/solveFixtures';
+import type { Solve } from '../../domain/solves';
 import { createDatabase } from './database';
 import { createSolveRepository, SolveNotFoundError } from './index';
 import type { SolveRepository } from './index';
@@ -13,10 +17,17 @@ import type { SolveRepository } from './index';
 describe('IndexedDB solve repository', () => {
   let databaseName: string;
   let repository: SolveRepository;
+  let sessionId: string;
+  const makeSolve = (overrides: Partial<Solve> = {}) =>
+    makeFixtureSolve({ sessionId, ...overrides });
+  const makeSolves = (times: readonly (number | null)[]) =>
+    makeFixtureSolves(times).map((solve) => ({ ...solve, sessionId }));
 
-  beforeEach(() => {
+  beforeEach(async () => {
     databaseName = `CubeTrainerDB-test-${crypto.randomUUID()}`;
-    repository = createSolveRepository(databaseName);
+    const training = createSolveRepository(databaseName);
+    repository = training;
+    sessionId = (await training.loadSnapshot()).activeSessionId;
   });
 
   afterEach(async () => {
@@ -24,19 +35,24 @@ describe('IndexedDB solve repository', () => {
     await Dexie.delete(databaseName);
   });
 
-  it('creates only the version 1 solves store with its required indexes', async () => {
+  it('creates version 2 stores and retains the required solve indexes', async () => {
     await repository.getAll();
     const database = createDatabase(databaseName);
     try {
       await database.open();
-      expect(database.verno).toBe(1);
-      expect(database.tables.map((table) => table.name)).toEqual(['solves']);
+      expect(database.verno).toBe(2);
+      expect(database.tables.map((table) => table.name).sort()).toEqual([
+        'sessions',
+        'settings',
+        'solves',
+      ]);
       const schema = database.table('solves').schema;
       expect(schema.primKey.name).toBe('id');
       expect(schema.primKey.auto).toBe(false);
       expect(schema.indexes.map((index) => index.name).sort()).toEqual([
         'createdAt',
         'event',
+        'sessionId',
       ]);
     } finally {
       database.close();

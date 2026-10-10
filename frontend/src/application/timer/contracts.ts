@@ -2,7 +2,11 @@ import type { Scramble, ScrambleGenerator } from '../../domain/scramble';
 import type { Solve } from '../../domain/solves';
 import type { AverageResult } from '../../domain/statistics';
 import type { TimerClock, TimerState } from '../../domain/timer';
-import type { SolveRepository } from '../../infrastructure/persistence/solveRepository';
+import type {
+  TrainingRepository,
+  SessionMutation,
+} from '../../infrastructure/persistence/trainingRepository';
+import type { Session } from '../../domain/sessions';
 
 export interface IdGenerator {
   generate(): string;
@@ -13,7 +17,7 @@ export interface DateProvider {
 }
 
 export interface TimerApplicationDependencies {
-  solveRepository: SolveRepository;
+  solveRepository: TrainingRepository;
   scrambleGenerator: ScrambleGenerator;
   timerClock: TimerClock;
   idGenerator: IdGenerator;
@@ -38,6 +42,7 @@ export type ScrambleState =
   | { readonly status: 'error'; readonly error: unknown };
 
 export type PendingMutation =
+  | { readonly type: 'session'; readonly mutation: SessionMutation }
   | { readonly type: 'save' | 'update'; readonly solve: Readonly<Solve> }
   | { readonly type: 'delete'; readonly solveId: string };
 
@@ -51,6 +56,10 @@ export type PersistenceState =
     };
 
 export interface TimerApplicationState {
+  readonly sessions: readonly Readonly<Session>[];
+  readonly activeSessionId: string | null;
+  readonly sessionSolveCounts: Readonly<Record<string, number>>;
+  readonly editing: boolean;
   readonly timer: TimerState;
   readonly displayedSolveId: string | null;
   readonly history: LoadState;

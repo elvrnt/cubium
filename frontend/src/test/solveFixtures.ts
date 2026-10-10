@@ -3,6 +3,7 @@ import type { Solve } from '../domain/solves';
 export function makeSolve(overrides: Partial<Solve> = {}): Solve {
   return {
     id: '00000000-0000-4000-8000-000000000000',
+    sessionId: 'test-main-session',
     event: '333',
     scramble: "R U R' U'",
     rawTimeMs: 12_483,

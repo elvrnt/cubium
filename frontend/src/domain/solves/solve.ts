@@ -3,6 +3,7 @@ export type SolvePenalty = 'NONE' | 'PLUS_TWO' | 'DNF';
 /** Source data: unique id, non-negative integer milliseconds, valid ISO timestamp. */
 export interface Solve {
   id: string;
+  sessionId: string;
   event: '333';
   scramble: string;
   rawTimeMs: number;

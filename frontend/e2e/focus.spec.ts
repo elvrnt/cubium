@@ -38,7 +38,7 @@ for (const close of ['button', 'Escape', 'backdrop']) {
 }
 
 test('pointer language selection returns Space to timer', async ({ page }) => {
-  const language = page.getByRole('combobox');
+  const language = page.getByRole('combobox', { name: /Language|Язык/ });
   await language.click();
   await language.selectOption('en');
   await page.keyboard.press('Escape');
@@ -57,7 +57,7 @@ test('Tab navigation retains native language control and cube button activation'
     page.getByRole('link', { name: 'Результаты', exact: true }),
   ).toBeFocused();
   await page.keyboard.press('Tab'); // language
-  const language = page.getByRole('combobox');
+  const language = page.getByRole('combobox', { name: /Language|Язык/ });
   await expect(language).toBeFocused();
   await page.keyboard.press('ArrowDown');
   await page.keyboard.press('Enter');
@@ -69,6 +69,14 @@ test('Tab navigation retains native language control and cube button activation'
     'idle',
   );
   await page.keyboard.press('Escape');
+  await page.keyboard.press('Tab'); // session selection
+  await expect(
+    page.getByRole('combobox', { name: 'Session', exact: true }),
+  ).toBeFocused();
+  await page.keyboard.press('Tab'); // session management
+  await expect(
+    page.getByRole('button', { name: 'Manage sessions', exact: true }),
+  ).toBeFocused();
   await page.keyboard.press('Tab'); // timer area
   await page.keyboard.press('Tab'); // cube
   await expect(

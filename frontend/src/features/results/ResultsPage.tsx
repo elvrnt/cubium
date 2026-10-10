@@ -25,6 +25,8 @@ import { useInteractionFocus } from '../timer/useInteractionFocus';
 import { SolveChart } from './SolveChart';
 import '../timer/timer.css';
 import './results.css';
+import { SessionControls } from '../sessions/SessionControls';
+import { DatabaseBlockedError } from '../../infrastructure/persistence';
 
 export function ResultsPage({
   application,
@@ -51,8 +53,27 @@ export function ResultsPage({
     (point) => point.solve.id === selectedId,
   );
   const [editing, setEditing] = useState(false);
+  const [sessionsOpen, setSessionsOpen] = useState(false);
   const [actionError, setActionError] = useState<unknown>(null);
-  usePageNavigationGuard(editing || !!selected);
+  usePageNavigationGuard(
+    editing || !!selected || sessionsOpen,
+    sessionsOpen && !editing && !selected,
+  );
+  useEffect(() => {
+    application.setEditingBlocked(editing || !!selected);
+    return () => application.setEditingBlocked(false);
+  }, [application, editing, selected]);
+  const previousSession = useRef(state.activeSessionId);
+  useEffect(() => {
+    if (
+      previousSession.current !== null &&
+      previousSession.current !== state.activeSessionId
+    ) {
+      setParams(new URLSearchParams(), { replace: true });
+      setSelectedId(null);
+    }
+    previousSession.current = state.activeSessionId;
+  }, [state.activeSessionId, setParams]);
   useEffect(() => {
     void application.loadHistory();
   }, [application]);
@@ -101,6 +122,13 @@ export function ResultsPage({
   return (
     <div className="timer-page results-page">
       <SiteHeader neutralRef={neutralRef} />
+      <SessionControls
+        application={application}
+        state={state}
+        neutralRef={neutralRef}
+        disabled={busy || editing || !!selected}
+        onOpenChange={setSessionsOpen}
+      />
       <main ref={neutralRef} tabIndex={-1}>
         <div className="results-title">
           <h1>{t('Results')}</h1>
@@ -117,6 +145,13 @@ export function ResultsPage({
           <section className="startup">
             {state.history.status === 'error' ? (
               <div role="alert">
+                {state.history.error instanceof DatabaseBlockedError && (
+                  <p>
+                    {t(
+                      'Close another Cubium tab to finish updating the database.',
+                    )}
+                  </p>
+                )}
                 <h2>{t('Could not load solve history')}</h2>
                 <p>
                   {t(
@@ -192,16 +227,17 @@ export function ResultsPage({
             {state.persistence.status === 'saving' && (
               <p role="status">{t('Saving on this device…')}</p>
             )}
-            {state.persistence.status === 'error' && (
-              <div role="alert" className="error-notice">
-                <p>
-                  {t(
-                    'Could not save your change. It is still held in memory. Retry before closing this page.',
-                  )}
-                </p>
-                <PersistenceRetry application={application} />
-              </div>
-            )}
+            {state.persistence.status === 'error' &&
+              state.persistence.pending.type !== 'session' && (
+                <div role="alert" className="error-notice">
+                  <p>
+                    {t(
+                      'Could not save your change. It is still held in memory. Retry before closing this page.',
+                    )}
+                  </p>
+                  <PersistenceRetry application={application} />
+                </div>
+              )}
             {actionError !== null && (
               <div role="alert" className="error-notice">
                 <p>
